@@ -1,8 +1,7 @@
 @php
     $currentRoute = request()->route()->getName();
 @endphp
-<aside
-    class="w-64 min-w-[16rem] h-[calc(100vh-64px)] bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden hidden md:flex">
+<aside class="w-64 min-w-[16rem] h-[calc(100vh-48px)] bg-[#fdfdfd] border-r border-gray-100 flex flex-col overflow-hidden text-gray-700 font-sans transition-all duration-300 hidden md:flex" style="font-family: 'Inter', sans-serif;">
 
     <nav class="flex-1 py-6 px-3 space-y-1 flex flex-col overflow-hidden min-h-0">
 
