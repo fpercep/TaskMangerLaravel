@@ -1,10 +1,25 @@
 @import "tailwindcss";
 
 @theme {
+    /* Colors */
     --color-orange-50: #fff7ed;
     --color-orange-100: #ffedd5;
     --color-orange-200: #fed7aa;
     --color-orange-400: #fb923c;
     --color-orange-500: #f97316;
     --color-orange-600: #ea580c;
+
+    /* Spacing & Sizes */
+    --spacing-header-sm: 50px;
+    --spacing-header-md: 52px;
+    
+    /* Border Radius */
+    --radius-btn: 6px;
+    --radius-menu: 10px;
+
+    /* Typograpy */
+    --text-menu: 14.5px;
+    --text-username: 15px;
+    --text-title-responsive: 17.5px;
+    --text-title-full: 19px;
 }
