@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->foreignId('team_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('status', ['active', 'archived', 'completed'])->default('active');
-            $table->enum('visibility', ['public', 'private'])->default('private');
+            $table->string('status')->default('active'); // active, archived, completed, planning, etc.
+            $table->string('visibility')->default('private'); // public, private
             $table->timestamps();
         });
     }

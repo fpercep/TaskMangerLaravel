@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -82,7 +83,7 @@ class Task extends Model
     /**
      * Scope: tareas pendientes.
      */
-    public function scopePending($query)
+    public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'pending');
     }
@@ -90,7 +91,7 @@ class Task extends Model
     /**
      * Scope: tareas en progreso.
      */
-    public function scopeInProgress($query)
+    public function scopeInProgress(Builder $query): Builder
     {
         return $query->where('status', 'in_progress');
     }
@@ -98,7 +99,7 @@ class Task extends Model
     /**
      * Scope: tareas completadas.
      */
-    public function scopeCompleted($query)
+    public function scopeCompleted(Builder $query): Builder
     {
         return $query->where('status', 'completed');
     }
@@ -106,7 +107,7 @@ class Task extends Model
     /**
      * Scope: filtrar por prioridad.
      */
-    public function scopeWithPriority($query, string $priority)
+    public function scopeWithPriority(Builder $query, string $priority): Builder
     {
         return $query->where('priority', $priority);
     }
@@ -114,7 +115,7 @@ class Task extends Model
     /**
      * Scope: tareas vencidas (fecha pasada y no completadas).
      */
-    public function scopeOverdue($query)
+    public function scopeOverdue(Builder $query): Builder
     {
         return $query->whereNotNull('due_date')
             ->where('due_date', '<', now())

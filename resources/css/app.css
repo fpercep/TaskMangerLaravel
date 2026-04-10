@@ -12,12 +12,26 @@
     /* Spacing & Sizes */
     --spacing-header-sm: 50px;
     --spacing-header-md: 52px;
+    --spacing-sidebar: 16rem;
     
+    /* Icon Sizes */
+    --spacing-icon-xs: 14px;
+    --spacing-icon-sm: 16px;
+    --spacing-icon-md: 17px;
+    --spacing-icon-lg: 19px;
+    --spacing-icon-xl: 20px;
+    --spacing-icon-avatar: 30px;
+    --spacing-icon-avatar-lg: 72px;
+
+    /* Component Widths */
+    --spacing-dropdown: 280px;
+
     /* Border Radius */
     --radius-btn: 6px;
     --radius-menu: 10px;
+    --radius-dropdown: 16px;
 
-    /* Typograpy */
+    /* Typography */
     --text-menu: 14.5px;
     --text-username: 15px;
     --text-title-responsive: 17.5px;

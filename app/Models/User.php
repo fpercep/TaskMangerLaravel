@@ -14,6 +14,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * @var array<string, string>
+     */
+    protected $appends = ['initials'];
+
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -84,32 +90,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Comprobar si el usuario tiene un rol específico en un equipo.
+     * Obtener las iniciales del nombre del usuario.
      */
-    public function hasRoleInTeam(Team $team, string $role): bool
+    public function getInitialsAttribute(): string
     {
-        return $this->teams()
-            ->where('teams.id', $team->id)
-            ->wherePivot('role', $role)
-            ->exists();
-    }
-
-    /**
-     * Comprobar si el usuario es miembro de un equipo (cualquier rol).
-     */
-    public function isMemberOf(Team $team): bool
-    {
-        return $this->teams()->where('teams.id', $team->id)->exists();
-    }
-
-    /**
-     * Comprobar si el usuario es owner o admin de un equipo.
-     */
-    public function canManageTeam(Team $team): bool
-    {
-        return $this->teams()
-            ->where('teams.id', $team->id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return collect(explode(' ', $this->name))
+            ->map(fn($n) => mb_substr($n, 0, 1))
+            ->take(2)
+            ->implode('');
     }
 }

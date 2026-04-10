@@ -15,16 +15,15 @@
 
 <body class="bg-white h-screen flex flex-col overflow-hidden" style="font-family: 'Inter', sans-serif;">
 
-    @include('components.partials.header')
+    <x-partials.header />
 
     <div class="flex flex-1 overflow-hidden">
 
-        @include('components.partials.sidebar')
+        <x-partials.sidebar />
 
         <main class="flex-1 overflow-y-auto bg-white p-8 relative">
             <div class="max-w-full mx-auto">
-                {{ $slot ?? '' }}
-                @yield('content')
+                {{ $slot }}
             </div>
         </main>
 

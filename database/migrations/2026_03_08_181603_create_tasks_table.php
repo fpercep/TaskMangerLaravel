@@ -12,12 +12,12 @@ return new class extends Migration {
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained()->onDelete('cascade');
+            $table->foreignId('project_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('parent_id')->nullable()->constrained('tasks')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
-            $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
+            $table->string('status')->default('pending'); // pending, in_progress, completed, cancelled
+            $table->string('priority')->default('medium'); // low, medium, high, urgent
             $table->date('start_date')->nullable();
             $table->date('due_date')->nullable();
             $table->timestamps();

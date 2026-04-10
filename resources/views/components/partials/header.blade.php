@@ -5,50 +5,49 @@
         
         <!-- ESTADO EXPANDIDO: Mismo ancho que el sidebar (256px) SIN LA LÍNEA DEL BORDE (border-r) -->
         <!-- CONTROLES DE NAVEGACIÓN: Alineados con el sidebar (256px) para una estética de rejilla perfecta -->
-        <div class="hidden md:flex items-center px-5 transition-all duration-300 h-full shrink-0 w-64 min-w-64 border-r border-gray-100/60">
+        <div class="hidden md:flex items-center px-6 transition-all duration-300 h-full shrink-0 w-sidebar min-w-sidebar border-r border-gray-100/60">
             
             <!-- Grupo de Flechas: Estilo Navegador -->
-            <div class="flex items-center gap-0.5">
-                <x-ui.icon-button icon="chevron-left" title="Atrás" iconClass="size-[18px]" />
-                <x-ui.icon-button icon="chevron-right" title="Adelante" iconClass="size-[18px]" />
+            <div class="flex items-center gap-1">
+                <x-ui.icon-button icon="chevron-left" title="Atrás" size="xl" />
+                <x-ui.icon-button icon="chevron-right" title="Adelante" size="xl" />
             </div>
 
-            <!-- Separador Minimalista (Más corto y sutil) -->
-            <div class="h-3.5 w-px bg-gray-200/80 mx-3.5"></div>
+            <!-- Separador Minimalista -->
+            <div class="h-4 w-px bg-gray-200/80 mx-4"></div>
             
-            <!-- Home: Acceso Directo con peso visual claro -->
-            <x-ui.icon-button href="{{ route('dashboard') ?? '#' }}" icon="home" title="Dashboard Principal" iconClass="size-[16.5px]" class="text-gray-500" />
+            <!-- Home: Acceso Directo -->
+            <x-ui.icon-button href="{{ route('dashboard') ?? '#' }}" icon="home" title="Dashboard Principal" size="lg" class="text-gray-500" />
 
         </div>
         
     </div>
 
-    <!-- CENTER SECTION: Título Dashboard (Letra más grande) -->
+    <!-- CENTER SECTION: Título Dashboard -->
     <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
-        <!-- Letra aumentada y estilizada -->
         <h1 class="text-title-responsive sm:text-title-full font-bold text-gray-900 tracking-tight whitespace-nowrap" style="letter-spacing: -0.02em;">Dashboard</h1>
     </div>
 
     <!-- RIGHT SECTION: Usuario -->
     <div x-data="{ open: false }" class="flex items-center justify-end h-full px-4 sm:px-6 min-w-0 flex-1 relative">
-        <button @click="open = !open" @keydown.escape="open = false" class="flex items-center gap-2 p-1 px-2 rounded-btn hover:bg-gray-50 transition-colors focus:outline-none cursor-pointer group">
+        <button @click="open = !open" @keydown.escape="open = false" class="flex items-center gap-3 p-1.5 px-2.5 rounded-btn hover:bg-gray-50 transition-all focus:outline-none cursor-pointer group">
             
             @php
                 $user = auth()->user();
-                $userName = $user ? $user->name : 'Usuario';
-                $userEmail = $user ? $user->email : 'usuario@ejemplo.com';
-                $userInitials = collect(explode(' ', $userName))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->implode('');
+                $userName = $user->name ?? 'Usuario';
+                $userEmail = $user->email ?? 'usuario@ejemplo.com';
+                $userInitials = $user->initials ?? 'US';
             @endphp
             
-            <!-- Avatar con Icono -->
-            <div class="w-[26px] h-[26px] rounded-full bg-[#F4F4F5] shrink-0 border border-gray-200 flex items-center justify-center overflow-hidden">
-                <span class="text-xs font-bold text-gray-400">{{ $userInitials }}</span>
+            <!-- Avatar Minimalista -->
+            <div class="size-icon-avatar rounded-full bg-gray-100 shrink-0 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105">
+                <span class="text-xs font-bold text-gray-500 uppercase">{{ $userInitials }}</span>
             </div>
             
             <!-- Nombre y Flecha -->
-            <div class="hidden md:flex items-center gap-1.5 min-w-0">
-                <span class="text-menu font-medium text-gray-500 group-hover:text-gray-800 transition-colors truncate">{{ $userName }}</span>
-                <i data-lucide="chevron-down" class="w-[15px] h-[15px] text-gray-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+            <div class="hidden md:flex items-center gap-2 min-w-0">
+                <span class="text-menu font-medium text-gray-600 group-hover:text-gray-900 transition-colors truncate">{{ $userName }}</span>
+                <i data-lucide="chevron-down" class="size-icon-sm text-gray-400 shrink-0 transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
             </div>
             
         </button>
@@ -63,16 +62,16 @@
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95"
              style="display: none;"
-             class="absolute top-[calc(100%+4px)] right-4 sm:right-6 w-[280px] bg-white rounded-[16px] shadow-[0_10px_35px_rgb(0,0,0,0.06)] border border-gray-100 p-2.5 z-50 origin-top-right transform">
+             class="absolute top-[calc(100%+0.25rem)] right-4 sm:right-6 w-dropdown bg-white rounded-dropdown shadow-[0_10px_35px_rgb(0,0,0,0.06)] border border-gray-100 p-2.5 z-50 origin-top-right transform">
             
             <!-- Botón Cerrar (X) Superior Derecha -->
             <button @click="open = false" class="absolute top-2.5 right-2.5 p-1.5 rounded-btn text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none" title="Cerrar">
-                <i data-lucide="x" class="w-[14px] h-[14px]"></i>
+                <i data-lucide="x" class="size-icon-xs"></i>
             </button>
 
             <!-- Avatar y Detalles Centrados con estética más profesional -->
             <div class="flex flex-col items-center mb-4 mt-3">
-                <div class="w-[72px] h-[72px] rounded-full bg-[#F4F4F5] border border-gray-200 shrink-0 mb-3 flex items-center justify-center overflow-hidden">
+                <div class="size-icon-avatar-lg rounded-full bg-[#F4F4F5] border border-gray-200 shrink-0 mb-3 flex items-center justify-center overflow-hidden">
                     <span class="text-xl font-bold text-gray-400">{{ $userInitials }}</span>
                 </div>
                 <h3 class="text-base font-bold text-gray-800">{{ $userName }}</h3>

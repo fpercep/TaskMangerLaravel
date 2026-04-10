@@ -6,20 +6,44 @@ class MiDiaController extends Controller
 {
     public function index()
     {
-        $fechaHoy = date('d/m/Y');
+        $user = auth()->user();
+        $fechaHoy = now();
 
-        $tareasMasTarde = [
-            ['titulo' => 'Revisar documentación API', 'equipo' => 'Equipo 1', 'proyecto' => 'Proyecto Alpha', 'fecha' => '05/02/2026'],
-            ['titulo' => 'Implementar autenticación', 'equipo' => 'Equipo 1', 'proyecto' => 'Rediseño Web', 'fecha' => '06/02/2026'],
-            ['titulo' => 'Diseñar mockups dashboard', 'equipo' => 'Equipo 2', 'proyecto' => 'Campaña Verano', 'fecha' => '07/02/2026'],
+        // Tareas pendientes con fecha de hoy o futura (o sin fecha)
+        $tareasMasTarde = $user->tasks()
+            ->with(['project.team'])
+            ->where('status', '!=', 'completed')
+            ->where(function ($query) use ($fechaHoy) {
+                $query->whereNull('due_date')
+                    ->orWhere('due_date', '>=', $fechaHoy->startOfDay());
+            })
+            ->get()
+            ->map($this->formatTask(...));
+
+        // Tareas pendientes con fecha pasada
+        $tareasAnteriores = $user->tasks()
+            ->with(['project.team'])
+            ->where('status', '!=', 'completed')
+            ->where('due_date', '<', $fechaHoy->startOfDay())
+            ->get()
+            ->map($this->formatTask(...));
+
+        $fechaHoyStr = $fechaHoy->format('d/m/Y');
+
+        return view('pages.mi-dia', [
+            'fechaHoy' => $fechaHoyStr,
+            'tareasMasTarde' => $tareasMasTarde,
+            'tareasAnteriores' => $tareasAnteriores,
+        ]);
+    }
+
+    private function formatTask($task)
+    {
+        return [
+            'titulo' => $task->name,
+            'equipo' => $task->project?->team?->name ?? 'Personal',
+            'proyecto' => $task->project?->name ?? 'Sin Proyecto',
+            'fecha' => $task->due_date ? $task->due_date->format('d/m/Y') : 'Sin fecha',
         ];
-
-        $tareasAnteriores = [
-            ['titulo' => 'Configurar base de datos', 'equipo' => 'Equipo 1', 'proyecto' => 'Proyecto Alpha', 'fecha' => '01/02/2026'],
-            ['titulo' => 'Revisar wireframes', 'equipo' => 'Equipo 2', 'proyecto' => 'Rediseño Web', 'fecha' => '31/01/2026'],
-            ['titulo' => 'Preparar presentación', 'equipo' => 'Equipo 1', 'proyecto' => 'Campaña Verano', 'fecha' => '30/01/2026'],
-        ];
-
-        return view('pages.mi-dia', compact('fechaHoy', 'tareasMasTarde', 'tareasAnteriores'));
     }
 }

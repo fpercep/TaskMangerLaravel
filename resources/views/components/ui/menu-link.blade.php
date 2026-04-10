@@ -8,13 +8,13 @@
     <form method="POST" action="{{ $action }}" class="m-0 mt-1">
         @csrf
         <button type="submit" class="{{ $classes }}">
-            <i data-lucide="{{ $icon }}" class="w-[17px] h-[17px]"></i>
+            <i data-lucide="{{ $icon }}" class="size-icon-md"></i>
             {{ $slot }}
         </button>
     </form>
 @else
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
-        <i data-lucide="{{ $icon }}" class="w-[17px] h-[17px] shrink-0 text-gray-400"></i>
+        <i data-lucide="{{ $icon }}" class="size-icon-md shrink-0 text-gray-400"></i>
         {{ $slot }}
     </a>
 @endif
