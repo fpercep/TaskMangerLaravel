@@ -23,7 +23,7 @@
         <div
             class="border-2 border-dashed border-gray-200 rounded-xl h-64 flex flex-col items-center justify-center text-gray-400">
             <i data-lucide="bar-chart-3" class="size-icon-avatar mb-3 text-gray-300"></i>
-            <p class="text-sm">Aquí irían las gráficas de rendimiento del equipo.</p>
+            <p class="text-sm">Aquí irían las gráficas de rendimiento general.</p>
         </div>
     </div>
 </x-app-layout>

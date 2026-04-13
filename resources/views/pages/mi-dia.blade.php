@@ -57,13 +57,7 @@
 
             <!-- Filtros (fijos, sin scroll) -->
             <div class="px-4 py-3 space-y-2 shrink-0 border-b border-gray-100">
-                <div class="filter-dropdown" x-data="{ open: false }">
-                    <button x-on:click="open = !open"
-                        class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium text-gray-700 border border-gray-200">
-                        <span>Equipo 1</span>
-                        <i data-lucide="chevron-down" class="size-icon-sm text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
-                    </button>
-                </div>
+
                 <div class="filter-dropdown" x-data="{ open: false }">
                     <button x-on:click="open = !open"
                         class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium text-gray-700 border border-gray-200">
@@ -94,9 +88,8 @@
                                     </p>
                                     <p class="text-xs text-gray-500 mt-0.5">
                                         <span class="text-orange-500">
-                                            {{ $tarea['equipo'] }}
-                                        </span> /
-                                        {{ $tarea['proyecto'] }} ·
+                                            {{ $tarea['proyecto'] }}
+                                        </span> ·
                                         {{ $tarea['fecha'] }}
                                     </p>
                                 </div>
@@ -127,9 +120,8 @@
                                     </p>
                                     <p class="text-xs text-gray-500 mt-0.5">
                                         <span class="text-orange-500">
-                                            {{ $tarea['equipo'] }}
-                                        </span> /
-                                        {{ $tarea['proyecto'] }} ·
+                                            {{ $tarea['proyecto'] }}
+                                        </span> ·
                                         {{ $tarea['fecha'] }}
                                     </p>
                                 </div>

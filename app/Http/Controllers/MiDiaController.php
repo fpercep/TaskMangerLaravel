@@ -11,7 +11,7 @@ class MiDiaController extends Controller
 
         // Tareas pendientes con fecha de hoy o futura (o sin fecha)
         $tareasMasTarde = $user->tasks()
-            ->with(['project.team'])
+            ->with(['project'])
             ->where('status', '!=', 'completed')
             ->where(function ($query) use ($fechaHoy) {
                 $query->whereNull('due_date')
@@ -22,7 +22,7 @@ class MiDiaController extends Controller
 
         // Tareas pendientes con fecha pasada
         $tareasAnteriores = $user->tasks()
-            ->with(['project.team'])
+            ->with(['project'])
             ->where('status', '!=', 'completed')
             ->where('due_date', '<', $fechaHoy->startOfDay())
             ->get()
@@ -41,7 +41,6 @@ class MiDiaController extends Controller
     {
         return [
             'titulo' => $task->name,
-            'equipo' => $task->project?->team?->name ?? 'Personal',
             'proyecto' => $task->project?->name ?? 'Sin Proyecto',
             'fecha' => $task->due_date ? $task->due_date->format('d/m/Y') : 'Sin fecha',
         ];

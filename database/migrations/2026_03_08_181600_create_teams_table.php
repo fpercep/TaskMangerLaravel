@@ -1,28 +1,23 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
-     * Run the migrations.
+     * Migración destructiva: elimina la tabla teams (entidad obsoleta).
      */
     public function up(): void
     {
-        Schema::create('teams', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
+        Schema::dropIfExists('team_user');
+        Schema::dropIfExists('teams');
     }
 
     /**
-     * Reverse the migrations.
+     * No se recrea la tabla. El concepto de "equipo" ha sido eliminado.
      */
     public function down(): void
     {
-        Schema::dropIfExists('teams');
+        // Intencional: no se restaura la tabla teams.
     }
 };

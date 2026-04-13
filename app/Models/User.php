@@ -54,24 +54,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Los equipos a los que pertenece el usuario (con su rol).
-     */
-    public function teams(): BelongsToMany
-    {
-        return $this->belongsToMany(Team::class)
-            ->withPivot('role')
-            ->withTimestamps();
-    }
-
-    /**
-     * Los equipos donde el usuario es dueño.
-     */
-    public function ownedTeams(): BelongsToMany
-    {
-        return $this->teams()->wherePivot('role', 'owner');
-    }
-
-    /**
      * Las tareas asignadas al usuario.
      */
     public function tasks(): BelongsToMany

@@ -1,7 +1,18 @@
 @import "tailwindcss";
 
+/* 
+ * Optimización de Escala fluida y semántica
+ */
+@media (max-width: 1536px) {
+    :root {
+        /* Escalado 1: Ajusta todas las clases utilitarias de Tailwind (incluyendo variables) */
+        font-size: 87.5%; /* 1rem pasa de 16px a 14px */
+    }
+}
+
+
 @theme {
-    /* Colors */
+    /* Colors (Sin cambios) */
     --color-orange-50: #fff7ed;
     --color-orange-100: #ffedd5;
     --color-orange-200: #fed7aa;
@@ -9,31 +20,31 @@
     --color-orange-500: #f97316;
     --color-orange-600: #ea580c;
 
-    /* Spacing & Sizes */
-    --spacing-header-sm: 50px;
-    --spacing-header-md: 52px;
+    /* Spacing & Sizes (px / 16 = rem) */
+    --spacing-header-sm: 3.125rem; /* 50px */
+    --spacing-header-md: 3.25rem; /* 52px */
     --spacing-sidebar: 16rem;
     
     /* Icon Sizes */
-    --spacing-icon-xs: 14px;
-    --spacing-icon-sm: 16px;
-    --spacing-icon-md: 17px;
-    --spacing-icon-lg: 19px;
-    --spacing-icon-xl: 20px;
-    --spacing-icon-avatar: 30px;
-    --spacing-icon-avatar-lg: 72px;
+    --spacing-icon-xs: 0.875rem; /* 14px */
+    --spacing-icon-sm: 1rem; /* 16px */
+    --spacing-icon-md: 1.0625rem; /* 17px */
+    --spacing-icon-lg: 1.1875rem; /* 19px */
+    --spacing-icon-xl: 1.25rem; /* 20px */
+    --spacing-icon-avatar: 1.875rem; /* 30px */
+    --spacing-icon-avatar-lg: 4.5rem; /* 72px */
 
     /* Component Widths */
-    --spacing-dropdown: 280px;
+    --spacing-dropdown: 17.5rem; /* 280px */
 
     /* Border Radius */
-    --radius-btn: 6px;
-    --radius-menu: 10px;
-    --radius-dropdown: 16px;
+    --radius-btn: 0.375rem; /* 6px */
+    --radius-menu: 0.625rem; /* 10px */
+    --radius-dropdown: 1rem; /* 16px */
 
     /* Typography */
-    --text-menu: 14.5px;
-    --text-username: 15px;
-    --text-title-responsive: 17.5px;
-    --text-title-full: 19px;
+    --text-menu: 0.90625rem; /* 14.5px */
+    --text-username: 0.9375rem; /* 15px */
+    --text-title-responsive: 1.09375rem; /* 17.5px */
+    --text-title-full: 1.1875rem; /* 19px */
 }

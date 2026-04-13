@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('status')->default('active'); // active, archived, completed, planning, etc.

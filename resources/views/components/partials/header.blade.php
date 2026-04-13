@@ -75,13 +75,13 @@
                     <span class="text-xl font-bold text-gray-400">{{ $userInitials }}</span>
                 </div>
                 <h3 class="text-base font-bold text-gray-800">{{ $userName }}</h3>
-                <p class="text-[13px] text-gray-400 mt-0.5">{{ $userEmail }}</p>
+                <p class="text-[0.8125rem] text-gray-400 mt-0.5">{{ $userEmail }}</p>
             </div>
 
             <div class="h-px w-full bg-gray-100 my-2"></div>
 
             <!-- Botones Limpios y Elegantes con Iconos -->
-            <div class="space-y-[2px]">
+            <div class="space-y-0.5">
                 <x-ui.menu-link href="{{ route('profile.edit') }}" icon="user">
                     Mi Perfil
                 </x-ui.menu-link>

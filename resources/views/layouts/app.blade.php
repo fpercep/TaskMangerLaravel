@@ -29,6 +29,11 @@
 
     </div>
 
+    <!-- Global Modals -->
+    <x-modals.create-project />
+    <x-modals.edit-project />
+    <x-modals.delete-project-confirmation />
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>lucide.createIcons();</script>
 
