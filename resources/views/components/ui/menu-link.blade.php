@@ -8,13 +8,13 @@
     <form method="POST" action="{{ $action }}" class="m-0 mt-1">
         @csrf
         <button type="submit" class="{{ $classes }}">
-            <i data-lucide="{{ $icon }}" class="size-icon-md"></i>
+            <x-dynamic-component :component="'lucide-' . $icon" class="size-icon-md" />
             {{ $slot }}
         </button>
     </form>
 @else
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
-        <i data-lucide="{{ $icon }}" class="size-icon-md shrink-0 text-gray-400"></i>
+        <x-dynamic-component :component="'lucide-' . $icon" class="size-icon-md shrink-0 text-gray-400" />
         {{ $slot }}
     </a>
 @endif

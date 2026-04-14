@@ -30,6 +30,19 @@ class ProjectController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Project $project)
+    {
+        // En un caso real, podrías autorizar si el usuario puede ver el proyecto.
+        // $this->authorize('view', $project);
+
+        return view('pages.projects.show', [
+            'project' => $project,
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateProjectRequest $request, Project $project)

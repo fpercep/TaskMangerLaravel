@@ -47,7 +47,7 @@
             <!-- Nombre y Flecha -->
             <div class="hidden md:flex items-center gap-2 min-w-0">
                 <span class="text-menu font-medium text-gray-600 group-hover:text-gray-900 transition-colors truncate">{{ $userName }}</span>
-                <i data-lucide="chevron-down" class="size-icon-sm text-gray-400 shrink-0 transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+                <x-lucide-chevron-down class="size-icon-sm text-gray-400 shrink-0 transition-transform duration-300" x-bind:class="open ? 'rotate-180' : ''" />
             </div>
             
         </button>
@@ -66,7 +66,7 @@
             
             <!-- Botón Cerrar (X) Superior Derecha -->
             <button @click="open = false" class="absolute top-2.5 right-2.5 p-1.5 rounded-btn text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none" title="Cerrar">
-                <i data-lucide="x" class="size-icon-xs"></i>
+                <x-lucide-x class="size-icon-xs" />
             </button>
 
             <!-- Avatar y Detalles Centrados con estética más profesional -->

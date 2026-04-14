@@ -13,7 +13,7 @@
                 <!-- Botón para abrir sugerencias (visible cuando panel está cerrado) -->
                 <button x-show="!showSuggestions" x-on:click="toggleSuggestions()" x-cloak
                     class="flex items-center gap-2 px-3 py-2 bg-orange-50 hover:bg-orange-100 text-orange-600 font-medium rounded-lg transition-all text-sm border border-orange-200">
-                    <i data-lucide="panel-right-open" class="size-icon-sm"></i>
+                    <x-lucide-panel-right-open class="size-icon-sm" />
                     <span>Sugerencias</span>
                 </button>
             </div>
@@ -26,7 +26,7 @@
                     <!-- Ilustración -->
                     <div
                         class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-orange-100 to-orange-50 rounded-2xl flex items-center justify-center">
-                        <i data-lucide="sun" class="size-icon-avatar text-orange-400"></i>
+                        <x-lucide-sun class="size-icon-avatar text-orange-400" />
                     </div>
 
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">No tienes tareas para hoy</h3>
@@ -35,7 +35,7 @@
 
                     <button x-on:click="toggleSuggestions()"
                         class="inline-flex items-center gap-2 px-4 py-2.5 bg-orange-400 hover:bg-orange-500 text-white font-medium rounded-lg transition-all shadow-sm hover:shadow-md text-sm">
-                        <i data-lucide="lightbulb" class="size-icon-sm"></i>
+                        <x-lucide-lightbulb class="size-icon-sm" />
                         Ver Sugerencias
                     </button>
                 </div>
@@ -51,7 +51,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Sugerencias</h2>
                 <button x-on:click="toggleSuggestions()"
                     class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600">
-                    <i data-lucide="x" class="size-icon-xl"></i>
+                    <x-lucide-x class="size-icon-xl" />
                 </button>
             </div>
 
@@ -62,7 +62,7 @@
                     <button x-on:click="open = !open"
                         class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium text-gray-700 border border-gray-200">
                         <span>Todos los proyectos</span>
-                        <i data-lucide="chevron-down" class="size-icon-sm text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        <x-lucide-chevron-down class="size-icon-sm text-gray-400 transition-transform duration-200" x-bind:class="open ? 'rotate-180' : ''" />
                     </button>
                 </div>
             </div>
@@ -75,8 +75,7 @@
                     <button x-on:click="toggle()"
                         class="w-full flex items-center justify-between py-3 text-left group">
                         <h3 class="text-sm font-semibold text-gray-800 group-hover:text-orange-500 transition-colors">Más Tarde</h3>
-                        <i data-lucide="chevron-down"
-                            class="size-icon-sm text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        <x-lucide-chevron-down class="size-icon-sm text-gray-400 transition-transform duration-200" x-bind:class="open ? 'rotate-180' : ''" />
                     </button>
                     <div x-show="open" x-collapse class="space-y-2 pb-2">
                         @foreach ($tareasMasTarde as $tarea)
@@ -95,7 +94,7 @@
                                 </div>
                                 <button
                                     class="opacity-0 group-hover:opacity-100 p-1.5 text-orange-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all">
-                                    <i data-lucide="plus" class="size-icon-sm"></i>
+                                    <x-lucide-plus class="size-icon-sm" />
                                 </button>
                             </div>
                         @endforeach
@@ -107,8 +106,7 @@
                     <button x-on:click="toggle()"
                         class="w-full flex items-center justify-between py-3 text-left group">
                         <h3 class="text-sm font-semibold text-gray-800 group-hover:text-orange-500 transition-colors">Anteriores</h3>
-                        <i data-lucide="chevron-down"
-                            class="size-icon-sm text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        <x-lucide-chevron-down class="size-icon-sm text-gray-400 transition-transform duration-200" x-bind:class="open ? 'rotate-180' : ''" />
                     </button>
                     <div x-show="open" x-collapse class="space-y-2 pb-2">
                         @foreach ($tareasAnteriores as $tarea)
@@ -127,7 +125,7 @@
                                 </div>
                                 <button
                                     class="opacity-0 group-hover:opacity-100 p-1.5 text-orange-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all">
-                                    <i data-lucide="plus" class="size-icon-sm"></i>
+                                    <x-lucide-plus class="size-icon-sm" />
                                 </button>
                             </div>
                         @endforeach

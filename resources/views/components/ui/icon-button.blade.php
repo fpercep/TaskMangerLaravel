@@ -15,10 +15,10 @@
 
 @if($href)
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes, 'title' => $title]) }}>
-        <i data-lucide="{{ $icon }}" class="{{ $iconSizeClass }} {{ $iconClass }}"></i>
+        <x-dynamic-component :component="'lucide-' . $icon" class="{{ $iconSizeClass }} {{ $iconClass }}" />
     </a>
 @else
     <button {{ $attributes->merge(['class' => $classes, 'title' => $title]) }}>
-        <i data-lucide="{{ $icon }}" class="{{ $iconSizeClass }} {{ $iconClass }}"></i>
+        <x-dynamic-component :component="'lucide-' . $icon" class="{{ $iconSizeClass }} {{ $iconClass }}" />
     </button>
 @endif

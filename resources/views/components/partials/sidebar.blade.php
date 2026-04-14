@@ -129,8 +129,8 @@
                     @foreach ($proyectosSidebar as $proyecto)
                     <div class="group relative flex items-center justify-between px-2 py-1.5 text-[0.84375rem] text-gray-500 rounded-md hover:bg-gray-50 hover:text-gray-800 transition-colors" x-data="{ openMenu: false }">
                         <!-- Enlace principal al Proyecto -->
-                        <a href="#" class="flex items-center truncate pl-2 flex-1 outline-none">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $proyecto->color }} mr-2.5 shrink-0 mix-blend-multiply"></span>
+                        <a href="{{ route('projects.show', $proyecto->id) }}" class="flex items-center truncate pl-2 flex-1 outline-none">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $proyecto->color ?? 'bg-orange-500' }} mr-2.5 shrink-0 mix-blend-multiply"></span>
                             <span class="truncate">{{ $proyecto->name }}</span>
                         </a>
                         

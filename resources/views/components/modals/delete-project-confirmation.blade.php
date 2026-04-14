@@ -35,7 +35,7 @@
         
         <div class="px-6 pt-8 pb-6">
             <div class="mx-auto flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-rose-100 mb-4">
-                <i data-lucide="alert-triangle" class="h-7 w-7 text-rose-600"></i>
+                <x-lucide-alert-triangle class="h-7 w-7 text-rose-600" />
             </div>
             
             <h3 class="text-base font-bold text-gray-900 mb-2">¿Eliminar proyecto?</h3>
@@ -44,7 +44,7 @@
             </p>
         </div>
 
-        <form :action="deleteUrl()" method="POST" class="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row-reverse sm:gap-3">
+        <form :action="deleteUrl()" method="POST" class="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row justify-center sm:gap-3">
             @csrf
             @method('DELETE')
             <button type="submit" class="w-full inline-flex justify-center rounded-md bg-rose-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:ml-3 sm:w-auto transition-colors">

@@ -29,7 +29,7 @@
         <div class="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100">
             <h3 class="text-sm font-bold text-gray-800">Crea un nuevo proyecto</h3>
             <button @click="show = false" type="button" class="text-gray-400 hover:text-gray-700 hover:bg-gray-50 p-1.5 rounded-btn transition-colors focus:outline-none">
-                <i data-lucide="x" class="size-icon-sm"></i>
+                <x-lucide-x class="size-icon-sm" />
             </button>
         </div>
 
@@ -54,7 +54,7 @@
             </div>
             
             <!-- Botonera -->
-            <div class="flex items-center gap-3 justify-end pt-2">
+            <div class="flex items-center gap-3 justify-center pt-2">
                 <button type="button" @click="show = false" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors focus:outline-none">
                     Cancelar
                 </button>
