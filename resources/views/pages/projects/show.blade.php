@@ -1,21 +1,25 @@
-<x-app-layout>
+<x-app-layout :title="'Proyecto - ' . $project->name">
     <div class="max-w-full mx-auto h-full flex flex-col">
         {{-- Header del Proyecto --}}
-        <div class="mb-6 flex flex-col items-start gap-1">
-            <h1 class="text-2xl font-bold text-gray-900">{{ $project->name }}</h1>
-            <p class="text-sm text-gray-500 ml-1">
-                Creado el {{ $project->created_at->format('d/m/Y') }} 
+        <div class="mb-10 flex flex-col items-start">
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight leading-none mb-3">{{ $project->name }}</h1>
+            
+            <div class="ml-0.5">
                 @if($project->description)
-                <span class="mx-2 text-gray-300">&bull;</span> {{ $project->description }}
+                    <p class="text-sm text-gray-600 max-w-2xl leading-relaxed font-medium">
+                        {{ $project->description }}
+                    </p>
                 @endif
-            </p>
+            </div>
         </div>
 
         {{-- Cuerpo del Proyecto (Vacío) --}}
-        <div class="flex-1 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 bg-gray-50/50 min-h-[400px]">
-             <x-lucide-folder-open class="size-icon-avatar mb-3 text-gray-300" />
-             <p class="text-sm font-medium">Contenido del proyecto vacío</p>
-             <p class="text-xs text-gray-400 mt-1">Aquí irán las tareas y secciones de este proyecto.</p>
+        <div class="flex-1 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 bg-gray-50/30 min-h-[400px] group hover:bg-gray-50/60 hover:border-gray-300 transition-all duration-300">
+             <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-white group-hover:shadow-sm transition-all duration-500">
+                 <x-lucide-folder-open class="size-8 text-gray-300 group-hover:text-gray-400 transition-colors" />
+             </div>
+             <p class="text-lg font-bold text-gray-500 mb-2">Contenido del proyecto vacío</p>
+             <p class="text-sm text-gray-400 text-center max-w-xs">Organiza este proyecto añadiendo tareas, secciones y plazos para tu equipo.</p>
         </div>
     </div>
 </x-app-layout>

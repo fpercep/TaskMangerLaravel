@@ -15,7 +15,7 @@
 
 <body class="bg-white h-screen flex flex-col overflow-hidden" style="font-family: 'Inter', sans-serif;">
 
-    <x-partials.header />
+    <x-partials.header :title="$title" />
 
     <div class="flex flex-1 overflow-hidden">
 

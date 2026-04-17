@@ -1,3 +1,5 @@
+@props(['title' => null])
+
 <header class="flex h-header-sm md:h-header-md bg-white border-b border-gray-200 shrink-0 w-full z-20 transition-all duration-300 relative" style="font-family: 'Inter', sans-serif;">
     
     <!-- LEFT SECTION -->
@@ -23,9 +25,23 @@
         
     </div>
 
-    <!-- CENTER SECTION: Título Dashboard -->
-    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
-        <h1 class="text-title-responsive sm:text-title-full font-bold text-gray-900 tracking-tight whitespace-nowrap" style="letter-spacing: -0.02em;">Dashboard</h1>
+    <!-- CENTER SECTION: Título dinámico -->
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center w-full max-w-[160px] sm:max-w-[240px] md:max-w-[320px] lg:max-w-[400px]">
+        @php
+            $routeName = Route::currentRouteName();
+            $autoTitle = match($routeName) {
+                'dashboard' => 'Dashboard',
+                'mi-dia' => 'Mi Día',
+                'projects.show' => 'Proyectos',
+                'profile.edit' => 'Mi Perfil',
+                default => 'Dashboard'
+            };
+            $originalTitle = $title ?? $autoTitle;
+            $displayTitle = Str::limit($originalTitle, 20);
+        @endphp
+        <h1 class="text-title-responsive sm:text-title-full font-bold text-gray-900 tracking-tight whitespace-nowrap select-none min-w-0" style="letter-spacing: -0.02em;" title="{{ $originalTitle }}">
+            {{ $displayTitle }}
+        </h1>
     </div>
 
     <!-- RIGHT SECTION: Usuario -->

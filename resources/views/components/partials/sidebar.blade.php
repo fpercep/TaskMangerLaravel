@@ -1,5 +1,6 @@
 @php
     $currentRoute = request()->route()->getName();
+    $activeProjectId = request()->route('project')?->id;
 @endphp
 
 <aside 
@@ -24,26 +25,7 @@
         ═══════════════════════════════════════════════════ --}}
         <div class="space-y-1 mb-4">
             
-            {{-- Search — Icono único con posicionamiento dinámico --}}
-            <div class="mb-3 relative" :class="collapsed ? 'flex justify-center' : ''">
-                {{-- Modo Colapsado: botón con icono centrado --}}
-                <button 
-                    x-show="collapsed" 
-                    class="w-10 h-10 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-500 focus:outline-none transition-colors" 
-                    title="Buscar..."
-                >
-                    <i data-lucide="search" class="size-icon-md"></i>
-                </button>
-                {{-- Modo Expandido: input con icono integrado --}}
-                <div x-show="!collapsed" x-transition.opacity.duration.300ms class="relative w-full">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 size-icon-md text-gray-500"></i>
-                    <input 
-                        type="text" 
-                        placeholder="Buscar..." 
-                        class="w-full bg-[#f4f5f7] border-transparent focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100 rounded-md py-2 pl-10 pr-3 text-sm transition-all placeholder:text-gray-500 focus:outline-none"
-                    />
-                </div>
-            </div>
+
 
             {{-- Dashboard --}}
             <a href="{{ route('dashboard') }}" 
@@ -127,11 +109,14 @@
 
                 <div class="space-y-0.5">
                     @foreach ($proyectosSidebar as $proyecto)
-                    <div class="group relative flex items-center justify-between px-2 py-1.5 text-[0.84375rem] text-gray-500 rounded-md hover:bg-gray-50 hover:text-gray-800 transition-colors" x-data="{ openMenu: false }">
+                    @php
+                        $isProjectActive = $activeProjectId == $proyecto->id;
+                    @endphp
+                    <div class="group relative flex items-center justify-between px-2 py-1.5 text-[0.84375rem] {{ $isProjectActive ? 'bg-orange-50/70 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800' }} rounded-md transition-colors" x-data="{ openMenu: false }">
                         <!-- Enlace principal al Proyecto -->
                         <a href="{{ route('projects.show', $proyecto->id) }}" class="flex items-center truncate pl-2 flex-1 outline-none">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $proyecto->color ?? 'bg-orange-500' }} mr-2.5 shrink-0 mix-blend-multiply"></span>
-                            <span class="truncate">{{ $proyecto->name }}</span>
+                            <span class="w-1.5 h-1.5 rounded-full {{ $proyecto->color ?? 'bg-orange-500' }} mr-2.5 shrink-0 {{ $isProjectActive ? '' : 'mix-blend-multiply' }}"></span>
+                            <span class="truncate {{ $isProjectActive ? 'font-semibold' : '' }}">{{ $proyecto->name }}</span>
                         </a>
                         
                         <!-- Botón 3 puntos -->

@@ -66,8 +66,16 @@ class ProjectController extends Controller
         // Usamos el Policy para autorizar la acción
         $this->authorize('delete', $project);
 
+        $projectUrl = route('projects.show', $project);
         $project->delete();
 
+        // Si el usuario estaba en la página del proyecto que se acaba de eliminar, 
+        // lo redirigimos al dashboard para evitar un 404.
+        if (url()->previous() === $projectUrl) {
+            return redirect()->route('dashboard')->with('success', 'Proyecto eliminado correctamente.');
+        }
+
+        // Si estaba en cualquier otra página (Dashboard, Mi Día, etc.), volvemos atrás.
         return back()->with('success', 'Proyecto eliminado correctamente.');
     }
 }
