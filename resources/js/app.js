@@ -11,6 +11,9 @@ window.Alpine = Alpine;
 
 // Registrar componentes globales
 import ui from './alpine/ui';
+import kanban from './alpine/kanban';
+
 ui();
+kanban();
 
 Alpine.start();

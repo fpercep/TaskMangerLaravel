@@ -13,13 +13,35 @@
             </div>
         </div>
 
-        {{-- Cuerpo del Proyecto (Vacío) --}}
-        <div class="flex-1 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 bg-gray-50/30 min-h-[400px] group hover:bg-gray-50/60 hover:border-gray-300 transition-all duration-300">
-             <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-white group-hover:shadow-sm transition-all duration-500">
-                 <x-lucide-folder-open class="size-8 text-gray-300 group-hover:text-gray-400 transition-colors" />
-             </div>
-             <p class="text-lg font-bold text-gray-500 mb-2">Contenido del proyecto vacío</p>
-             <p class="text-sm text-gray-400 text-center max-w-xs">Organiza este proyecto añadiendo tareas, secciones y plazos para tu equipo.</p>
+        {{-- Cuerpo del Proyecto - Tablero Kanban --}}
+        <div class="flex-1 min-h-0 w-full overflow-x-auto flex flex-col"
+             x-data="kanbanBoard({{ Js::from($tasks) }}, '{{ route('tasks.update_status', ['task' => ':id']) }}')">
+
+            <div class="min-w-max md:min-w-0 md:w-full flex-1 grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-3 py-2">
+                <x-kanban.column
+                    status="pending"
+                    label="Pendientes"
+                    dot-color="bg-gray-400"
+                    badge-classes="bg-gray-200 text-gray-600"
+                    empty-text="Sin tareas"
+                />
+
+                <x-kanban.column
+                    status="in_progress"
+                    label="En Curso"
+                    dot-color="bg-blue-500"
+                    badge-classes="bg-blue-100 text-blue-700"
+                    empty-text="Mueve una tarea aquí"
+                />
+
+                <x-kanban.column
+                    status="completed"
+                    label="Completadas"
+                    dot-color="bg-green-500"
+                    badge-classes="bg-green-100 text-green-700"
+                    empty-text="Aún no hay tareas"
+                />
+            </div>
         </div>
     </div>
 </x-app-layout>

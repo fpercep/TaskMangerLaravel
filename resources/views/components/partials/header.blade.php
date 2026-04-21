@@ -33,7 +33,7 @@
                 'dashboard' => 'Dashboard',
                 'mi-dia' => 'Mi Día',
                 'projects.show' => 'Proyectos',
-                'profile.edit' => 'Mi Perfil',
+                'settings.index' => 'Ajustes',
                 default => 'Dashboard'
             };
             $originalTitle = $title ?? $autoTitle;
@@ -98,11 +98,11 @@
 
             <!-- Botones Limpios y Elegantes con Iconos -->
             <div class="space-y-0.5">
-                <x-ui.menu-link href="{{ route('profile.edit') }}" icon="user">
+                <x-ui.menu-link href="{{ route('settings.index', ['tab' => 'profile']) }}" icon="user">
                     Mi Perfil
                 </x-ui.menu-link>
                 
-                <x-ui.menu-link href="#" icon="settings">
+                <x-ui.menu-link href="{{ route('settings.index', ['tab' => 'config']) }}" icon="settings">
                     Configuración de Cuenta
                 </x-ui.menu-link>
                 

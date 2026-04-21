@@ -20,6 +20,12 @@
     --color-orange-500: #f97316;
     --color-orange-600: #ea580c;
 
+    /* Semantic Status/Priority Colors */
+    --color-priority-low: var(--color-blue-500);
+    --color-priority-medium: var(--color-yellow-400);
+    --color-priority-high: var(--color-orange-500);
+    --color-priority-urgent: var(--color-red-500);
+
     /* Spacing & Sizes (px / 16 = rem) */
     --spacing-header-sm: 3.125rem; /* 50px */
     --spacing-header-md: 3.25rem; /* 52px */

@@ -4,12 +4,6 @@ export default () => {
         
         toggleSuggestions() {
             this.showSuggestions = !this.showSuggestions;
-            // Esperar a que Alpine actualice el DOM para recrear iconos si es necesario
-            this.$nextTick(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            });
         }
     }));
 
@@ -18,11 +12,6 @@ export default () => {
         
         toggleSidebar() {
             this.collapsed = !this.collapsed;
-            this.$nextTick(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            });
         }
     }));
 
@@ -31,6 +20,25 @@ export default () => {
         
         toggle() {
             this.open = !this.open;
+        }
+    }));
+
+    Alpine.data('modalState', (modalName, extraData = {}) => ({
+        show: false,
+        ...extraData,
+        handleOpen(event) {
+            if (event.detail.name === modalName) {
+                this.show = true;
+                if(event.detail.payload) {
+                    Object.assign(this, event.detail.payload);
+                }
+                if (this.onOpen) this.onOpen();
+            }
+        },
+        handleClose(event) {
+            if (!event || event.detail.name === modalName) {
+                this.show = false;
+            }
         }
     }));
 };

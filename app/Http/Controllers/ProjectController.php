@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class ProjectController extends Controller
 {
@@ -25,6 +26,8 @@ class ProjectController extends Controller
             'visibility' => 'private',
         ], ['role' => 'admin']);
 
+        Cache::forget(Auth::user()->sidebarCacheKey());
+
         // Redirect back with success message
         return back()->with('success', 'Proyecto creado correctamente.');
     }
@@ -37,8 +40,23 @@ class ProjectController extends Controller
         // En un caso real, podrías autorizar si el usuario puede ver el proyecto.
         // $this->authorize('view', $project);
 
+        $project->load(['tasks' => function ($query) {
+            $query->orderBy('priority', 'desc')->orderBy('created_at', 'desc');
+        }]);
+
+        // Transformamos para no inyectar atributos innecesarios a Alpine
+        $tasks = $project->tasks->map(function ($task) {
+            return [
+                'id' => $task->id,
+                'name' => $task->name,
+                'status' => $task->status,
+                'priority' => $task->priority,
+            ];
+        });
+
         return view('pages.projects.show', [
             'project' => $project,
+            'tasks' => $tasks,
         ]);
     }
 
@@ -55,6 +73,8 @@ class ProjectController extends Controller
             'description' => $validated['description'] ?? null,
         ]);
 
+        Cache::forget(Auth::user()->sidebarCacheKey());
+
         return back()->with('success', 'Proyecto actualizado correctamente.');
     }
 
@@ -68,6 +88,8 @@ class ProjectController extends Controller
 
         $projectUrl = route('projects.show', $project);
         $project->delete();
+
+        Cache::forget(Auth::user()->sidebarCacheKey());
 
         // Si el usuario estaba en la página del proyecto que se acaba de eliminar, 
         // lo redirigimos al dashboard para evitar un 404.

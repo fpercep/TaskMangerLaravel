@@ -9,24 +9,22 @@ class MiDiaController extends Controller
         $user = auth()->user();
         $fechaHoy = now();
 
-        // Tareas pendientes con fecha de hoy o futura (o sin fecha)
-        $tareasMasTarde = $user->tasks()
-            ->with(['project'])
-            ->where('status', '!=', 'completed')
-            ->where(function ($query) use ($fechaHoy) {
-                $query->whereNull('due_date')
-                    ->orWhere('due_date', '>=', $fechaHoy->startOfDay());
-            })
-            ->get()
-            ->map($this->formatTask(...));
+        $startOfDay = $fechaHoy->copy()->startOfDay();
 
-        // Tareas pendientes con fecha pasada
-        $tareasAnteriores = $user->tasks()
+        // Obtener todas las tareas no completadas con su proyecto
+        $pendientes = $user->tasks()
             ->with(['project'])
             ->where('status', '!=', 'completed')
-            ->where('due_date', '<', $fechaHoy->startOfDay())
-            ->get()
-            ->map($this->formatTask(...));
+            ->get();
+
+        // Particionar en memoria (true -> anteriores, false -> más tarde)
+        [$tareasAnteriores, $tareasMasTarde] = $pendientes->partition(function ($task) use ($startOfDay) {
+            return $task->due_date && $task->due_date < $startOfDay;
+        });
+
+        // Formatear
+        $tareasMasTarde = $tareasMasTarde->map($this->formatTask(...))->values();
+        $tareasAnteriores = $tareasAnteriores->map($this->formatTask(...))->values();
 
         $fechaHoyStr = $fechaHoy->format('d/m/Y');
 

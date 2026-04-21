@@ -15,7 +15,7 @@
         class="absolute top-4 -right-3.5 z-10 w-7 h-7 bg-white border border-gray-200 rounded-full flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 shadow-sm transition-all focus:outline-none"
         title="Contraer / Mostrar menú"
     >
-        <i data-lucide="chevron-left" class="size-icon-sm transition-transform duration-300" :class="collapsed ? 'rotate-180' : ''"></i>
+        <x-lucide-chevron-left class="size-icon-sm transition-transform duration-300" x-bind:class="collapsed ? 'rotate-180' : ''" />
     </button>
 
     <nav class="flex-1 py-5 flex flex-col overflow-y-auto overflow-x-hidden min-h-0 custom-scrollbar" :class="collapsed ? 'px-4' : 'px-3'">
@@ -34,7 +34,7 @@
                title="Dashboard"
             >
                 <div class="w-10 h-10 flex items-center justify-center shrink-0">
-                    <i data-lucide="layout-grid" class="size-icon-xl {{ $currentRoute === 'dashboard' ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600' }}"></i>
+                    <x-lucide-layout-grid class="size-icon-xl {{ $currentRoute === 'dashboard' ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600' }}" />
                 </div>
                 <span x-show="!collapsed" x-transition.opacity.duration.300ms class="text-menu font-medium ml-1">Dashboard</span>
             </a>
@@ -46,7 +46,7 @@
                title="Lista de Tareas"
             >
                 <div class="w-10 h-10 flex items-center justify-center shrink-0">
-                    <i data-lucide="list-todo" class="size-icon-xl {{ $currentRoute === 'mi-dia' ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600' }}"></i>
+                    <x-lucide-list-todo class="size-icon-xl {{ $currentRoute === 'mi-dia' ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600' }}" />
                 </div>
                 <span x-show="!collapsed" x-transition.opacity.duration.300ms class="text-menu font-medium ml-1">Lista de Tareas</span>
             </a>
@@ -58,7 +58,7 @@
                title="Calendario"
             >
                 <div class="w-10 h-10 flex items-center justify-center shrink-0">
-                    <i data-lucide="calendar" class="size-icon-xl text-gray-400 group-hover:text-gray-600"></i>
+                    <x-lucide-calendar class="size-icon-xl text-gray-400 group-hover:text-gray-600" />
                 </div>
                 <span x-show="!collapsed" x-transition.opacity.duration.300ms class="text-menu font-medium ml-1">Calendario</span>
             </a>
@@ -73,7 +73,7 @@
         <div class="mt-4 mb-4 flex flex-col">
             {{-- Modo Colapsado --}}
             <div x-show="collapsed" class="flex justify-center mb-2">
-                <i data-lucide="clock" class="size-icon-md text-gray-400"></i>
+                <x-lucide-clock class="size-icon-md text-gray-400" />
             </div>
 
             {{-- Modo Expandido --}}
@@ -95,15 +95,15 @@
         <div class="mt-4 flex-1 flex flex-col">
             {{-- Modo Colapsado --}}
             <div x-show="collapsed" class="flex justify-center mb-2">
-                <i data-lucide="folder-kanban" class="size-icon-md text-gray-400"></i>
+                <x-lucide-folder-kanban class="size-icon-md text-gray-400" />
             </div>
 
             {{-- Modo Expandido --}}
             <div x-show="!collapsed" class="flex-1 flex flex-col group/header">
                 <div class="px-2 flex items-center justify-between mb-2">
                     <span class="text-[0.75rem] font-bold text-gray-400/90 uppercase tracking-wider">Proyectos</span>
-                    <button @click="$dispatch('open-create-project-modal')" class="opacity-0 group-hover/header:opacity-100 p-0.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded transition-all focus:outline-none" title="Nuevo proyecto">
-                        <i data-lucide="plus" class="size-icon-xs"></i>
+                    <button @click="$dispatch('open-modal', { name: 'create-project' })" class="opacity-0 group-hover/header:opacity-100 p-0.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded transition-all focus:outline-none" title="Nuevo proyecto">
+                        <x-lucide-plus class="size-icon-xs" />
                     </button>
                 </div>
 
@@ -120,13 +120,12 @@
                         </a>
                         
                         <!-- Botón 3 puntos -->
-                        <button @click.prevent="openMenu = !openMenu" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 p-1 focus:outline-none rounded hover:bg-gray-200 transition-colors cursor-pointer shrink-0" :class="openMenu ? 'opacity-100 bg-gray-200 text-gray-600' : ''">
-                            <i data-lucide="more-horizontal" class="size-icon-xs"></i>
+                        <button @click.prevent="openMenu = !openMenu" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 p-1 focus:outline-none rounded hover:bg-gray-200 transition-colors cursor-pointer shrink-0 mr-1" :class="openMenu ? 'opacity-100 bg-gray-200 text-gray-600' : ''">
+                            <x-lucide-more-horizontal class="size-icon-xs" />
                         </button>
 
                         <!-- Dropdown Contextual -->
                         <div x-show="openMenu"
-                             @click.outside="openMenu = false"
                              x-transition:enter="transition ease-out duration-100"
                              x-transition:enter-start="opacity-0 scale-95"
                              x-transition:enter-end="opacity-100 scale-100"
@@ -136,16 +135,16 @@
                              style="display: none;"
                              class="absolute right-0 top-full mt-1 w-36 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50">
                             
-                            <button @click="openMenu = false; $dispatch('open-edit-project-modal', { project: {{ json_encode($proyecto) }} })" 
+                            <button @click="openMenu = false; $dispatch('open-modal', { name: 'edit-project', payload: { project: @js($proyecto) } })" 
                                     class="w-full text-left px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-900 flex items-center transition-colors">
-                                <i data-lucide="pencil" class="size-icon-xs mr-2 text-gray-400"></i> Editar
+                                <x-lucide-pencil class="size-icon-xs mr-2 text-gray-400" /> Editar
                             </button>
                             
                             <div class="h-px bg-gray-100 my-1"></div>
                             
-                            <button @click="openMenu = false; $dispatch('open-delete-project-modal', { project: {{ json_encode($proyecto) }} })" 
+                            <button @click="openMenu = false; $dispatch('open-modal', { name: 'delete-project', payload: { project: @js($proyecto) } })" 
                                     class="w-full text-left px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 flex items-center transition-colors">
-                                <i data-lucide="trash-2" class="size-icon-xs mr-2 text-rose-400"></i> Eliminar
+                                <x-lucide-trash-2 class="size-icon-xs mr-2 text-rose-400" /> Eliminar
                             </button>
                         </div>
                     </div>

@@ -81,4 +81,12 @@ class User extends Authenticatable
             ->take(2)
             ->implode('');
     }
+
+    /**
+     * Clave de caché para los proyectos del sidebar de este usuario.
+     */
+    public function sidebarCacheKey(): string
+    {
+        return "sidebar_projects_{$this->id}";
+    }
 }

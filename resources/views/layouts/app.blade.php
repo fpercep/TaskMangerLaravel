@@ -34,8 +34,7 @@
     <x-modals.edit-project />
     <x-modals.delete-project-confirmation />
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>lucide.createIcons();</script>
+
 
     @stack('scripts')
 </body>
