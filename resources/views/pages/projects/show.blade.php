@@ -44,4 +44,7 @@
             </div>
         </div>
     </div>
+
+    {{-- Modals --}}
+    <x-modals.create-task :project="$project" />
 </x-app-layout>

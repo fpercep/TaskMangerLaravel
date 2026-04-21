@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
     // Rutas de Tareas
+    Route::post('/projects/{project}/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update_status');
 
     // Ajustes unificados (tabs: profile / config)

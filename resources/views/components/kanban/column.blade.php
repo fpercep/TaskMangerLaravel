@@ -31,6 +31,7 @@
         @if(in_array($status, ['pending', 'in_progress']))
             <button 
                 type="button" 
+                @click="$dispatch('open-modal', { name: 'create-task', payload: { status: '{{ $status }}' } })"
                 class="flex items-center justify-center gap-2 w-full py-3 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-600 hover:border-gray-300 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
             >
                 <x-lucide-plus class="w-4 h-4" />
