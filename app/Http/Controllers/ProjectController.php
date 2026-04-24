@@ -49,8 +49,10 @@ class ProjectController extends Controller
             return [
                 'id' => $task->id,
                 'name' => $task->name,
+                'description' => $task->description,
                 'status' => $task->status,
                 'priority' => $task->priority,
+                'due_date' => $task->due_date,
             ];
         });
 

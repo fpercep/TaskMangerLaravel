@@ -45,42 +45,7 @@
                     </div>
                 </div>
 
-                <div class="pt-2">
-                    <x-ui.input-label value="Prioridad" class="mb-4" />
-                    <div class="flex w-full border-t border-gray-100">
-                        <label class="flex-1 relative cursor-pointer group">
-                            <input type="radio" name="priority" value="low" class="peer sr-only">
-                            <div class="absolute -top-px inset-x-0 h-1 bg-transparent peer-checked:bg-orange-400 transition-all duration-300"></div>
-                            <div class="pt-4 pb-2 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400 peer-checked:text-gray-900 peer-hover:text-gray-600 transition-colors">
-                                Baja
-                            </div>
-                        </label>
-
-                        <label class="flex-1 relative cursor-pointer group">
-                            <input type="radio" name="priority" value="medium" checked class="peer sr-only">
-                            <div class="absolute -top-px inset-x-0 h-1 bg-transparent peer-checked:bg-orange-500 transition-all duration-300"></div>
-                            <div class="pt-4 pb-2 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400 peer-checked:text-gray-900 peer-hover:text-gray-600 transition-colors">
-                                Media
-                            </div>
-                        </label>
-
-                        <label class="flex-1 relative cursor-pointer group">
-                            <input type="radio" name="priority" value="high" class="peer sr-only">
-                            <div class="absolute -top-px inset-x-0 h-1 bg-transparent peer-checked:bg-orange-600 transition-all duration-300"></div>
-                            <div class="pt-4 pb-2 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400 peer-checked:text-gray-900 peer-hover:text-gray-600 transition-colors">
-                                Alta
-                            </div>
-                        </label>
-
-                        <label class="flex-1 relative cursor-pointer group">
-                            <input type="radio" name="priority" value="urgent" class="peer sr-only">
-                            <div class="absolute -top-px inset-x-0 h-1 bg-transparent peer-checked:bg-red-500 transition-all duration-300"></div>
-                            <div class="pt-4 pb-2 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400 peer-checked:text-red-600 peer-hover:text-gray-600 transition-colors">
-                                Urgente
-                            </div>
-                        </label>
-                    </div>
-                </div>
+                <x-ui.priority-slider name="priority" :value="1" />
 
                 <div>
                     <x-ui.input-label for="task_due_date" value="Fecha límite" />

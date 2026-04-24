@@ -26,6 +26,27 @@ export default () => {
             }, { 'pending': [], 'in_progress': [], 'completed': [] });
         },
 
+        formatDate(dateString) {
+            if (!dateString) return 'xx/xx/xxxx';
+            
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'xx/xx/xxxx';
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${day}/${ month}/${ year}`;
+        },
+
+        isOverdue(task) {
+            if (!task.due_date || task.status === 'completed') return false;
+            const dueDate = new Date(task.due_date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return dueDate < today;
+        },
+
         priorityBorderClass(task) {
             if (!task.priority) return 'border-l-gray-300';
             const map = task.status === 'completed' ? PRIORITY_BORDER_COMPLETED : PRIORITY_BORDER_ACTIVE;
