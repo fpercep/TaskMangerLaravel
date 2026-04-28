@@ -42,7 +42,7 @@
              </div>
              
              <div class="pt-2">
-                 <x-ui.primary-button type="button" onclick="alert('Demo: Las preferencias se guardarán en el futuro')">Guardar Preferencias</x-ui.primary-button>
+                 <x-ui.primary-button type="button" @click="$dispatch('notify', { message: 'Demo: Las preferencias se guardarán en el futuro', type: 'info' })">Guardar Preferencias</x-ui.primary-button>
              </div>
         </div>
     </div>
@@ -59,35 +59,32 @@
         <div class="space-y-6 max-w-2xl">
              
             <!-- Switch Notification 1 -->
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                     <h3 class="text-sm font-medium text-gray-900">Notificaciones por Email</h3>
-                     <p class="text-sm text-gray-500">Recibir resúmenes y alertas críticas en tu bandeja de entrada.</p>
-                </div>
-                <x-ui.toggle default="true" name="prefs-emails" />
-            </div>
+            <x-ui.setting-row 
+                title="Notificaciones por Email" 
+                description="Recibir resúmenes y alertas críticas en tu bandeja de entrada." 
+                name="prefs-emails" 
+                default="true" 
+            />
             
             <div class="border-t border-gray-100"></div>
             
             <!-- Switch Notification 2 -->
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                     <h3 class="text-sm font-medium text-gray-900">Asignación de Tareas</h3>
-                     <p class="text-sm text-gray-500">Aviso cuando alguien te asigna a una nueva tarea o proyecto.</p>
-                </div>
-                <x-ui.toggle default="true" name="prefs-assignments" />
-            </div>
+            <x-ui.setting-row 
+                title="Asignación de Tareas" 
+                description="Aviso cuando alguien te asigna a una nueva tarea o proyecto." 
+                name="prefs-assignments" 
+                default="true" 
+            />
             
              <div class="border-t border-gray-100"></div>
             
             <!-- Switch Notification 3 -->
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                     <h3 class="text-sm font-medium text-gray-900">Resumen Diario</h3>
-                     <p class="text-sm text-gray-500">Un correo en la mañana con tus tareas pendientes del día.</p>
-                </div>
-                <x-ui.toggle default="false" name="prefs-digest" />
-            </div>
+            <x-ui.setting-row 
+                title="Resumen Diario" 
+                description="Un correo en la mañana con tus tareas pendientes del día." 
+                name="prefs-digest" 
+                default="false" 
+            />
 
         </div>
     </div>
@@ -110,7 +107,7 @@
              <div>
                 <dt class="text-gray-500 mb-1">Exportar Datos de Cuenta</dt>
                 <dd>
-                     <button type="button" class="text-orange-600 hover:text-orange-700 font-medium hover:underline transition-colors focus:outline-none" onclick="alert('Generando archivo export.zip...')">
+                     <button type="button" class="text-orange-600 hover:text-orange-700 font-medium hover:underline transition-colors focus:outline-none" @click="$dispatch('notify', { message: 'Generando archivo export.zip...', type: 'info' })">
                          Descargar .ZIP
                      </button>
                 </dd>

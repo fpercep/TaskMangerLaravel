@@ -20,19 +20,11 @@ class Project extends Model
     ];
 
     /**
-     * Las tareas del proyecto (solo tareas principales, sin subtareas).
+     * Las tareas del proyecto.
      */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
-    }
-
-    /**
-     * Solo las tareas raíz (sin padre).
-     */
-    public function rootTasks(): HasMany
-    {
-        return $this->hasMany(Task::class)->whereNull('parent_id');
     }
 
     /**
@@ -67,6 +59,14 @@ class Project extends Model
     public function managers(): BelongsToMany
     {
         return $this->users()->wherePivot('role', 'manager');
+    }
+
+    /**
+     * Usuarios con rol admin en el proyecto (creadores).
+     */
+    public function admins(): BelongsToMany
+    {
+        return $this->users()->wherePivot('role', 'admin');
     }
 
     /**

@@ -6,7 +6,7 @@
         <div class="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-100 transition-all duration-300">
              <div class="w-2 h-2 rounded-full shadow-sm" :class="current.color"></div>
              <span x-text="current.label" 
-                   class="text-[11px] font-bold uppercase tracking-wider text-gray-700"></span>
+                   class="text-2xs font-bold uppercase tracking-wider text-gray-700"></span>
         </div>
     </div>
 
@@ -48,7 +48,7 @@
         <template x-for="(p, index) in priorities" :key="index">
             <button type="button" 
                     @click="priorityIndex = index"
-                    class="text-[10px] font-bold uppercase tracking-[0.1em] transition-all duration-200 w-12 text-center focus:outline-none"
+                    class="text-2xs font-bold uppercase tracking-[0.1em] transition-all duration-200 w-12 text-center focus:outline-none"
                     :class="priorityIndex == index ? 'text-gray-900 scale-110' : 'text-gray-300 hover:text-gray-400'"
                     x-text="p.label"></button>
         </template>

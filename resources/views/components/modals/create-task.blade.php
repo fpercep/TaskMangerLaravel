@@ -2,9 +2,7 @@
 
 <x-ui.dialog name="create-task" max-width="lg" alpine-data="{
     status: 'pending',
-    onOpen() {
-        this.$nextTick(() => this.$refs.taskName.focus());
-    }
+    onOpen() { this.$nextTick(() => this.$refs.taskName.focus()); }
 }">
     <div class="bg-white">
         <!-- Header -->
@@ -34,18 +32,12 @@
                 <div class="space-y-4">
                     <x-ui.input-label value="Estado" />
                     <div class="flex items-center gap-6">
-                        <label class="flex items-center gap-2 cursor-pointer group">
-                            <input type="radio" name="status" value="pending" x-model="status" class="h-4 w-4 border-gray-300 text-orange-600 focus:ring-orange-600 focus:ring-offset-1 transition-colors">
-                            <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">Pendiente</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer group">
-                            <input type="radio" name="status" value="in_progress" x-model="status" class="h-4 w-4 border-gray-300 text-orange-600 focus:ring-orange-600 focus:ring-offset-1 transition-colors">
-                            <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">En Curso</span>
-                        </label>
+                        <x-ui.radio name="status" value="pending" label="Pendiente" x-model="status" />
+                        <x-ui.radio name="status" value="in_progress" label="En Curso" x-model="status" />
                     </div>
                 </div>
 
-                <x-ui.priority-slider name="priority" :value="1" />
+                <x-tasks.priority-slider name="priority" :value="1" />
 
                 <div>
                     <x-ui.input-label for="task_due_date" value="Fecha límite" />
@@ -65,3 +57,4 @@
         </form>
     </div>
 </x-ui.dialog>
+

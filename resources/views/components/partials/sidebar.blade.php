@@ -112,10 +112,10 @@
                     @php
                         $isProjectActive = $activeProjectId == $proyecto->id;
                     @endphp
-                    <div class="group relative flex items-center justify-between px-2 py-1.5 text-[0.84375rem] {{ $isProjectActive ? 'bg-orange-50/70 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800' }} rounded-md transition-colors" x-data="{ openMenu: false }">
+                    <div class="group relative flex items-center justify-between px-2 py-1.5 text-sidebar-item font-medium {{ $isProjectActive ? 'bg-orange-50/70 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800' }} rounded-md transition-colors" x-data="{ openMenu: false }">
                         <!-- Enlace principal al Proyecto -->
                         <a href="{{ route('projects.show', $proyecto->id) }}" class="flex items-center truncate pl-2 flex-1 outline-none">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $proyecto->color ?? 'bg-orange-500' }} mr-2.5 shrink-0 {{ $isProjectActive ? '' : 'mix-blend-multiply' }}"></span>
+                            <span class="w-2 h-2 rounded-full {{ $proyecto->color ?? 'bg-orange-500' }} mr-2.5 shrink-0 {{ $isProjectActive ? '' : 'mix-blend-multiply' }}"></span>
                             <span class="truncate {{ $isProjectActive ? 'font-semibold' : '' }}">{{ $proyecto->name }}</span>
                         </a>
                         
@@ -124,29 +124,25 @@
                             <x-lucide-more-horizontal class="size-icon-xs" />
                         </button>
 
-                        <!-- Dropdown Contextual -->
-                        <div x-show="openMenu"
-                             x-transition:enter="transition ease-out duration-100"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-75"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             style="display: none;"
-                             class="absolute right-0 top-full mt-1 w-36 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50">
-                            
-                            <button @click="openMenu = false; $dispatch('open-modal', { name: 'edit-project', payload: { project: @js($proyecto) } })" 
-                                    class="w-full text-left px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-900 flex items-center transition-colors">
-                                <x-lucide-pencil class="size-icon-xs mr-2 text-gray-400" /> Editar
-                            </button>
-                            
+                        <!-- Dropdown Contextual Reutilizable -->
+                        <x-ui.context-menu width="w-36">
+                            <x-ui.dropdown-item 
+                                icon="pencil" 
+                                @click.stop='openMenu = false; editProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }}, {{ Js::from($proyecto->description) }})'
+                            >
+                                Editar
+                            </x-ui.dropdown-item>
+
                             <div class="h-px bg-gray-100 my-1"></div>
-                            
-                            <button @click="openMenu = false; $dispatch('open-modal', { name: 'delete-project', payload: { project: @js($proyecto) } })" 
-                                    class="w-full text-left px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 flex items-center transition-colors">
-                                <x-lucide-trash-2 class="size-icon-xs mr-2 text-rose-400" /> Eliminar
-                            </button>
-                        </div>
+
+                            <x-ui.dropdown-item 
+                                icon="trash-2" 
+                                :destructive="true" 
+                                @click.stop='openMenu = false; deleteProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }})'
+                            >
+                                Eliminar
+                            </x-ui.dropdown-item>
+                        </x-ui.context-menu>
                     </div>
                     @endforeach
                 </div>

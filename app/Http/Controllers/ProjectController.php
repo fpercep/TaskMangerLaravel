@@ -37,11 +37,19 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        // En un caso real, podrías autorizar si el usuario puede ver el proyecto.
-        // $this->authorize('view', $project);
+        $this->authorize('view', $project);
 
         $project->load(['tasks' => function ($query) {
-            $query->orderBy('priority', 'desc')->orderBy('created_at', 'desc');
+            $query->where(function ($q) {
+                $q->where('status', '!=', 'completed')
+                  ->orWhere('updated_at', '>=', now()->subDays(7));
+            })
+            ->withCount('steps')
+            ->withCount(['steps as completed_steps_count' => function ($q) {
+                $q->where('is_completed', true);
+            }])
+            ->orderBy('priority', 'desc')
+            ->orderBy('created_at', 'desc');
         }]);
 
         // Transformamos para no inyectar atributos innecesarios a Alpine
@@ -49,10 +57,12 @@ class ProjectController extends Controller
             return [
                 'id' => $task->id,
                 'name' => $task->name,
-                'description' => $task->description,
+                'has_description' => !empty($task->description),
                 'status' => $task->status,
                 'priority' => $task->priority,
                 'due_date' => $task->due_date,
+                'steps_count' => $task->steps_count,
+                'completed_steps_count' => $task->completed_steps_count,
             ];
         });
 

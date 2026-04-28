@@ -30,19 +30,4 @@
             </main>
         </div>
     </div>
-
-    @push('scripts')
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('settingsTabs', () => ({
-                tab: new URLSearchParams(window.location.search).get('tab') || 'profile',
-                
-                switchTab(newTab) {
-                    this.tab = newTab;
-                    window.history.replaceState(null, null, '?tab=' + newTab);
-                }
-            }));
-        });
-    </script>
-    @endpush
 </x-app-layout>

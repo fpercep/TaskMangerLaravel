@@ -7,7 +7,7 @@
         
         <!-- ESTADO EXPANDIDO: Mismo ancho que el sidebar (256px) SIN LA LÍNEA DEL BORDE (border-r) -->
         <!-- CONTROLES DE NAVEGACIÓN: Alineados con el sidebar (256px) para una estética de rejilla perfecta -->
-        <div class="hidden md:flex items-center px-6 transition-all duration-300 h-full shrink-0 w-sidebar min-w-sidebar border-r border-gray-100/60">
+        <div class="hidden md:flex items-center px-6 transition-all duration-300 h-full shrink-0 w-sidebar min-w-sidebar">
             
             <!-- Grupo de Flechas: Estilo Navegador -->
             <div class="flex items-center gap-1">

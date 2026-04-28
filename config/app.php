@@ -86,6 +86,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Date Format
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the default date format used throughout the
+    | application for displaying dates to users. Controllers should use
+    | this value instead of hardcoding date formats.
+    |
+    */
+
+    'date_format' => env('APP_DATE_FORMAT', 'd/m/Y'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |

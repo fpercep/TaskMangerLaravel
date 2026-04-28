@@ -13,9 +13,10 @@ const PRIORITY_BORDER_COMPLETED = {
 };
 
 export default () => {
-    Alpine.data('kanbanBoard', (initialTasks, updateStatusUrl) => ({
+    Alpine.data('kanbanBoard', (initialTasks, routes) => ({
         tasks: initialTasks,
         draggingTaskId: null,
+        renamingTaskId: null,
         hoveringColumn: null,
 
         get tasksGrouped() {
@@ -24,6 +25,42 @@ export default () => {
                 groups[task.status].push(task);
                 return groups;
             }, { 'pending': [], 'in_progress': [], 'completed': [] });
+        },
+
+        renameTask(task) {
+            this.renamingTaskId = task.id;
+        },
+
+        cancelRenaming() {
+            this.renamingTaskId = null;
+        },
+
+        async updateTaskName(task, newName) {
+            if (!newName || newName.trim() === '' || newName === task.name) {
+                this.cancelRenaming();
+                return;
+            }
+
+            const oldName = task.name;
+            task.name = newName;
+            this.renamingTaskId = null;
+
+            try {
+                const url = routes.update.replace(':id', task.id);
+                await window.axios.patch(url, { name: newName });
+                
+                this.$dispatch('notify', {
+                    message: 'Nombre actualizado correctamente.',
+                    type: 'success',
+                });
+            } catch (error) {
+                console.error('Error actualizando el nombre:', error);
+                task.name = oldName;
+                this.$dispatch('notify', {
+                    message: 'No se pudo actualizar el nombre de la tarea.',
+                    type: 'error',
+                });
+            }
         },
 
         formatDate(dateString) {
@@ -80,7 +117,7 @@ export default () => {
             task.status = newStatus;
 
             try {
-                const url = updateStatusUrl.replace(':id', task.id);
+                const url = routes.update.replace(':id', task.id);
                 await window.axios.patch(url, { status: newStatus });
 
                 this.$dispatch('task-status-updated', { taskId: task.id, status: newStatus });
@@ -89,6 +126,46 @@ export default () => {
                 task.status = oldStatus;
                 this.$dispatch('notify', {
                     message: 'No se pudo actualizar el estado de la tarea.',
+                    type: 'error',
+                });
+            }
+        },
+
+        async duplicateTask(task) {
+            try {
+                const url = routes.duplicate.replace(':id', task.id);
+                const response = await window.axios.post(url);
+                
+                if (response.data && response.data.task) {
+                    this.tasks.push(response.data.task);
+                    this.$dispatch('notify', {
+                        message: response.data.message || 'Tarea duplicada correctamente.',
+                        type: 'success',
+                    });
+                }
+            } catch (error) {
+                console.error('Error duplicando la tarea:', error);
+                this.$dispatch('notify', {
+                    message: 'No se pudo duplicar la tarea.',
+                    type: 'error',
+                });
+            }
+        },
+
+        async deleteTask(task) {
+            try {
+                const url = routes.delete.replace(':id', task.id);
+                const response = await window.axios.delete(url);
+                
+                this.tasks = this.tasks.filter(t => t.id !== task.id);
+                this.$dispatch('notify', {
+                    message: response.data.message || 'Tarea eliminada correctamente.',
+                    type: 'success',
+                });
+            } catch (error) {
+                console.error('Error eliminando la tarea:', error);
+                this.$dispatch('notify', {
+                    message: 'No se pudo eliminar la tarea.',
                     type: 'error',
                 });
             }

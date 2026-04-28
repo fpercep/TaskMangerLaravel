@@ -15,7 +15,6 @@ class Task extends Model
 
     protected $fillable = [
         'project_id',
-        'parent_id',
         'name',
         'description',
         'status',
@@ -41,19 +40,11 @@ class Task extends Model
     }
 
     /**
-     * La tarea padre (null si es tarea principal).
+     * Los pasos (checklist) de esta tarea.
      */
-    public function parent(): BelongsTo
+    public function steps(): HasMany
     {
-        return $this->belongsTo(Task::class, 'parent_id');
-    }
-
-    /**
-     * Las subtareas de esta tarea.
-     */
-    public function subtasks(): HasMany
-    {
-        return $this->hasMany(Task::class, 'parent_id');
+        return $this->hasMany(TaskStep::class)->orderBy('position');
     }
 
     /**
@@ -62,22 +53,6 @@ class Task extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withTimestamps();
-    }
-
-    /**
-     * ¿Es una subtarea?
-     */
-    public function isSubtask(): bool
-    {
-        return $this->parent_id !== null;
-    }
-
-    /**
-     * ¿Tiene subtareas?
-     */
-    public function hasSubtasks(): bool
-    {
-        return $this->subtasks()->exists();
     }
 
     /**
@@ -118,7 +93,7 @@ class Task extends Model
     public function scopeOverdue(Builder $query): Builder
     {
         return $query->whereNotNull('due_date')
-            ->where('due_date', '<', now())
+            ->where('due_date', '<', today())
             ->whereNotIn('status', ['completed', 'cancelled']);
     }
 }

@@ -5,17 +5,13 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
             @foreach ($estadisticas as $stat)
-                <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="p-3 bg-{{ $stat['color'] }}-50 rounded-lg text-{{ $stat['color'] }}-500">
-                            <x-dynamic-component :component="'lucide-' . $stat['icono']" class="size-icon-xl" />
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">{{ $stat['titulo'] }}</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $stat['valor'] }}</p>
-                        </div>
-                    </div>
-                </div>
+                <x-ui.stat-card 
+                    :titulo="$stat['titulo']"
+                    :valor="$stat['valor']"
+                    :icono="$stat['icono']"
+                    :bg-class="$stat['bg_class']"
+                    :text-class="$stat['text_class']"
+                />
             @endforeach
 
         </div>

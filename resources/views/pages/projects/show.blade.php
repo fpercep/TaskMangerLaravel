@@ -15,7 +15,16 @@
 
         {{-- Cuerpo del Proyecto - Tablero Kanban --}}
         <div class="flex-1 min-h-0 w-full overflow-x-auto flex flex-col"
-             x-data="kanbanBoard({{ Js::from($tasks) }}, '{{ route('tasks.update_status', ['task' => ':id']) }}')">
+             x-data="kanbanBoard(
+                 {{ Js::from($tasks) }}, 
+                 {{ Js::from([
+                    'update' => route('tasks.update', ['task' => ':id']),
+                    'update_status' => route('tasks.update_status', ['task' => ':id']),
+                    'duplicate' => route('tasks.duplicate', ['task' => ':id']),
+                    'delete' => route('tasks.destroy', ['task' => ':id'])
+                 ]) }}
+             )"
+             @confirm-delete-task.window="deleteTask($event.detail)">
 
             <div class="min-w-max md:min-w-0 md:w-full flex-1 grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-3 py-2">
                 <x-kanban.column
@@ -47,4 +56,6 @@
 
     {{-- Modals --}}
     <x-modals.create-task :project="$project" />
+    <x-modals.show-task :project="$project" />
+    <x-modals.delete-task-confirmation />
 </x-app-layout>

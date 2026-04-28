@@ -2,14 +2,14 @@
     <!-- Componente de Identidad / Avatar -->
     <div class="bg-white p-6 md:p-8 shadow-sm rounded-xl border border-gray-100 flex items-center gap-6">
         <div class="w-20 h-20 rounded-full bg-gray-100 border border-gray-200 shrink-0 flex items-center justify-center overflow-hidden">
-             <span class="text-2xl font-bold text-gray-500 uppercase">{{ $user->initials }}</span>
+             <span class="text-2xl font-bold text-gray-500 uppercase">{{ $userData['initials'] }}</span>
         </div>
         <div>
-            <h2 class="text-xl font-bold text-gray-900">{{ $user->name }}</h2>
-            <p class="text-sm text-gray-500 mt-1">{{ $user->email }}</p>
+            <h2 class="text-xl font-bold text-gray-900">{{ $userData['name'] }}</h2>
+            <p class="text-sm text-gray-500 mt-1">{{ $userData['email'] }}</p>
             <div class="mt-3 flex items-center gap-2 text-xs text-gray-400">
                 <x-lucide-calendar class="w-4 h-4" />
-                <span>Miembro desde {{ $user->created_at->translatedFormat('M Y') }}</span>
+                <span>Miembro desde {{ $userData['member_since'] }}</span>
             </div>
         </div>
     </div>
