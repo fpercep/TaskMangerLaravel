@@ -70,7 +70,7 @@
        :class="isOverdue(task) ? 'text-red-500' : 'text-gray-400'">
         <div class="flex items-center gap-1">
             <x-lucide-calendar class="size-3" stroke-width="1.5" />
-            <span x-text="formatDate(task.due_date)"></span>
+            <span x-text="$formatDate(task.due_date)"></span>
         </div>
         
         <template x-if="task.has_description">

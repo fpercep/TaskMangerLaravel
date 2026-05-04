@@ -120,4 +120,14 @@ export default () => {
             this.left = targetLeft;
         }
     }));
+
+    Alpine.data('taskDetailModal', () => ({
+        show: false,
+        task: {},
+
+        handleOpen(e) {
+            this.task = e.detail;
+            this.show = true;
+        }
+    }));
 };

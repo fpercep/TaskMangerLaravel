@@ -63,19 +63,6 @@ export default () => {
             }
         },
 
-        formatDate(dateString) {
-            if (!dateString) return 'xx/xx/xxxx';
-            
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return 'xx/xx/xxxx';
-            
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            
-            return `${day}/${ month}/${ year}`;
-        },
-
         isOverdue(task) {
             if (!task.due_date || task.status === 'completed') return false;
             const dueDate = new Date(task.due_date);

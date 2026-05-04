@@ -16,4 +16,18 @@ import kanban from './alpine/kanban';
 ui();
 kanban();
 
+// Helpers globales
+Alpine.magic('formatDate', () => {
+    return (dateString) => {
+        if (!dateString) return 'Sin definir';
+        const date = new Date(dateString.replace(' ', 'T'));
+        if (isNaN(date.getTime())) return dateString;
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+});
+
 Alpine.start();

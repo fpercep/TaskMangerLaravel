@@ -58,4 +58,8 @@
     --text-username: 0.9375rem; /* 15px */
     --text-title-responsive: 1.09375rem; /* 17.5px */
     --text-title-full: 1.1875rem; /* 19px */
+
+    /* Min Heights */
+    --spacing-empty-sm: 3.75rem; /* 60px — Estado vacío pequeño (descripción) */
+    --spacing-empty-md: 6.25rem; /* 100px — Estado vacío mediano (pasos) */
 }

@@ -44,6 +44,7 @@ class ProjectController extends Controller
                 $q->where('status', '!=', 'completed')
                   ->orWhere('updated_at', '>=', now()->subDays(7));
             })
+            ->with('steps')
             ->withCount('steps')
             ->withCount(['steps as completed_steps_count' => function ($q) {
                 $q->where('is_completed', true);
@@ -52,19 +53,30 @@ class ProjectController extends Controller
             ->orderBy('created_at', 'desc');
         }]);
 
-        // Transformamos para no inyectar atributos innecesarios a Alpine
         $tasks = $project->tasks->map(function ($task) {
             return [
                 'id' => $task->id,
                 'name' => $task->name,
+                'description' => $task->description,
                 'has_description' => !empty($task->description),
                 'status' => $task->status,
                 'priority' => $task->priority,
-                'due_date' => $task->due_date,
+                'due_date' => $task->due_date?->format('d/m/Y'),
+                'created_at' => $task->created_at->format('d/m/Y'),
+                'updated_at' => $task->updated_at->format('d/m/Y'),
+                'steps' => $task->steps->map(function ($step) {
+                    return [
+                        'id' => $step->id,
+                        'name' => $step->name,
+                        'is_completed' => $step->is_completed,
+                    ];
+                }),
                 'steps_count' => $task->steps_count,
                 'completed_steps_count' => $task->completed_steps_count,
             ];
         });
+
+        $project->unsetRelation('tasks');
 
         return view('pages.projects.show', [
             'project' => $project,
