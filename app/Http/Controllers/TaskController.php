@@ -33,15 +33,15 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'status' => ['sometimes', 'required', 'string', 'in:pending,in_progress,completed'],
+            'status' => ['sometimes', 'required', 'string', 'in:pending,in_progress,completed,cancelled'],
             'priority' => ['sometimes', 'required', 'string', 'in:low,medium,high,urgent'],
             'description' => ['sometimes', 'nullable', 'string'],
             'due_date' => ['sometimes', 'nullable', 'date'],
         ]);
-
-        $this->authorize('update', $task);
 
         $task->update($validated);
 
@@ -53,28 +53,6 @@ class TaskController extends Controller
         ]);
     }
 
-    /**
-     * Actualiza el estado de una tarea (para el Kanban).
-     */
-    public function updateStatus(Request $request, Task $task)
-    {
-        $validated = $request->validate([
-            'status' => ['required', 'string', 'in:pending,in_progress,completed'],
-        ]);
-
-        $this->authorize('update', $task);
-
-        $task->update([
-            'status' => $validated['status'],
-        ]);
-
-        // Invalidar caché de estadísticas del dashboard
-        Cache::forget('dashboard_stats_' . auth()->id());
-
-        return response()->json([
-            'message' => 'Estado actualizado correctamente',
-        ]);
-    }
 
     /**
      * Duplica una tarea (calco 1:1).
@@ -83,8 +61,9 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
 
-        // Cargamos los conteos una sola vez de forma eficiente
-        $task->loadCount([
+        // Cargamos la relación y los conteos en una sola operación encadenada.
+        // load('steps') es necesario para el foreach; loadCount para los contadores del payload.
+        $task->load('steps')->loadCount([
             'steps',
             'steps as completed_steps_count' => fn($q) => $q->where('is_completed', true)
         ]);

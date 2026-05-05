@@ -19,12 +19,12 @@
                  {{ Js::from($tasks) }}, 
                  {{ Js::from([
                     'update' => route('tasks.update', ['task' => ':id']),
-                    'update_status' => route('tasks.update_status', ['task' => ':id']),
                     'duplicate' => route('tasks.duplicate', ['task' => ':id']),
                     'delete' => route('tasks.destroy', ['task' => ':id'])
                  ]) }}
              )"
-             @confirm-delete-task.window="deleteTask($event.detail)">
+             @confirm-delete-task.window="deleteTask($event.detail)"
+             @task-modal-updated.window="syncTaskFromModal($event.detail)">
 
             <div class="min-w-max md:min-w-0 md:w-full flex-1 grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-3 py-2">
                 <x-kanban.column

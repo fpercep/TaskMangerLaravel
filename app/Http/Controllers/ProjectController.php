@@ -61,9 +61,9 @@ class ProjectController extends Controller
                 'has_description' => !empty($task->description),
                 'status' => $task->status,
                 'priority' => $task->priority,
-                'due_date' => $task->due_date?->format('d/m/Y'),
-                'created_at' => $task->created_at->format('d/m/Y'),
-                'updated_at' => $task->updated_at->format('d/m/Y'),
+                'due_date' => $task->due_date?->format('Y-m-d'), // Formato ISO para input[type=date]
+                'created_at' => $task->created_at->format('Y-m-d'),
+                'updated_at' => $task->updated_at->format('Y-m-d'),
                 'steps' => $task->steps->map(function ($step) {
                     return [
                         'id' => $step->id,

@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MyDayController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskStepController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -21,9 +22,14 @@ Route::middleware('auth')->group(function () {
     // Rutas de Tareas
     Route::post('/projects/{project}/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update_status');
     Route::post('/tasks/{task}/duplicate', [TaskController::class, 'duplicate'])->name('tasks.duplicate');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    // Rutas de Pasos (Steps)
+    Route::post('/tasks/{task}/steps', [TaskStepController::class, 'store'])->name('steps.store');
+    Route::patch('/steps/{step}', [TaskStepController::class, 'update'])->name('steps.update');
+    Route::patch('/steps/{step}/toggle', [TaskStepController::class, 'toggle'])->name('steps.toggle');
+    Route::delete('/steps/{step}', [TaskStepController::class, 'destroy'])->name('steps.destroy');
 
     // Ajustes unificados (tabs: profile / config)
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');

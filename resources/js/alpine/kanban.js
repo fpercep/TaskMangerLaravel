@@ -18,6 +18,13 @@ export default () => {
         draggingTaskId: null,
         renamingTaskId: null,
         hoveringColumn: null,
+        processingTaskIds: new Set(),
+
+        get today() {
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            return d;
+        },
 
         get tasksGrouped() {
             return this.tasks.reduce((groups, task) => {
@@ -36,7 +43,7 @@ export default () => {
         },
 
         async updateTaskName(task, newName) {
-            if (!newName || newName.trim() === '' || newName === task.name) {
+            if (!newName || newName.trim() === '' || newName.trim() === task.name.trim()) {
                 this.cancelRenaming();
                 return;
             }
@@ -65,10 +72,7 @@ export default () => {
 
         isOverdue(task) {
             if (!task.due_date || task.status === 'completed') return false;
-            const dueDate = new Date(task.due_date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            return dueDate < today;
+            return new Date(task.due_date) < this.today;
         },
 
         priorityBorderClass(task) {
@@ -97,7 +101,8 @@ export default () => {
             event.preventDefault();
             this.hoveringColumn = null;
 
-            const task = this.tasks.find(t => t.id === this.draggingTaskId);
+            const draggedId = this.draggingTaskId;
+            const task = this.tasks.find(t => t.id === draggedId);
             if (!task || task.status === newStatus) return;
 
             const oldStatus = task.status;
@@ -119,6 +124,9 @@ export default () => {
         },
 
         async duplicateTask(task) {
+            if (this.processingTaskIds.has(task.id)) return;
+            this.processingTaskIds.add(task.id);
+
             try {
                 const url = routes.duplicate.replace(':id', task.id);
                 const response = await window.axios.post(url);
@@ -136,10 +144,15 @@ export default () => {
                     message: 'No se pudo duplicar la tarea.',
                     type: 'error',
                 });
+            } finally {
+                this.processingTaskIds.delete(task.id);
             }
         },
 
         async deleteTask(task) {
+            if (this.processingTaskIds.has(task.id)) return;
+            this.processingTaskIds.add(task.id);
+
             try {
                 const url = routes.delete.replace(':id', task.id);
                 const response = await window.axios.delete(url);
@@ -155,6 +168,25 @@ export default () => {
                     message: 'No se pudo eliminar la tarea.',
                     type: 'error',
                 });
+            } finally {
+                this.processingTaskIds.delete(task.id);
+            }
+        },
+
+        syncTaskFromModal(detail) {
+            const ALLOWED_FIELDS = [
+                'name', 'status', 'priority', 'due_date',
+                'description', 'has_description',
+                'steps_count', 'completed_steps_count',
+            ];
+
+            const task = this.tasks.find(t => t.id === detail.taskId);
+            if (!task) return;
+
+            for (const key of ALLOWED_FIELDS) {
+                if (key in detail) {
+                    task[key] = detail[key];
+                }
             }
         },
     }));

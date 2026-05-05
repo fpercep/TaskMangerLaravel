@@ -12,9 +12,11 @@ window.Alpine = Alpine;
 // Registrar componentes globales
 import ui from './alpine/ui';
 import kanban from './alpine/kanban';
+import taskDetailModal from './alpine/task-detail-modal';
 
 ui();
 kanban();
+taskDetailModal();
 
 // Helpers globales
 Alpine.magic('formatDate', () => {

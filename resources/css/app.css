@@ -59,7 +59,16 @@
     --text-title-responsive: 1.09375rem; /* 17.5px */
     --text-title-full: 1.1875rem; /* 19px */
 
+    /* Z-Index Hierarchy — T-F7: Reemplaza z-[...] arbitrarios */
+    --z-index-modal: 800;
+    --z-index-modal-top: 900;
+    --z-index-confirmation: 1000;
+
+    /* Shadows */
+    --shadow-modal: 0 20px 50px -12px rgb(0 0 0 / 0.15);
+
     /* Min Heights */
     --spacing-empty-sm: 3.75rem; /* 60px — Estado vacío pequeño (descripción) */
-    --spacing-empty-md: 6.25rem; /* 100px — Estado vacío mediano (pasos) */
+    --spacing-empty-md: 6.25rem; /* 100px — Estado vacío mediano (pasos/descripción) */
+    --spacing-steps-min: 12.5rem; /* 200px — Altura mínima de la sección de pasos */
 }
