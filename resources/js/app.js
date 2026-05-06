@@ -13,10 +13,12 @@ window.Alpine = Alpine;
 import ui from './alpine/ui';
 import kanban from './alpine/kanban';
 import taskDetailModal from './alpine/task-detail-modal';
+import projectMembers from './alpine/project-members';
 
 ui();
 kanban();
 taskDetailModal();
+projectMembers();
 
 // Helpers globales
 Alpine.magic('formatDate', () => {

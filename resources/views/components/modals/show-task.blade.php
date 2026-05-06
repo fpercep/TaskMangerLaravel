@@ -106,8 +106,8 @@
                                                class="text-sm text-gray-700 bg-white border border-orange-300 focus:ring-2 focus:ring-orange-100 rounded px-1 outline-none shadow-inner" />
                                     </div>
                                     <span class="text-gray-200">|</span>
-                                    <div class="relative">
-                                        <button type="button" @click="assignOpen = !assignOpen" @click.outside="assignOpen = false"
+                                    <div class="relative" @click.outside="assignOpen = false">
+                                        <button type="button" @click="assignOpen = !assignOpen"
                                             class="flex items-center gap-1.5 hover:text-gray-600 transition-colors duration-200 cursor-pointer focus:outline-none"
                                             title="Persona asignada">
                                             <x-lucide-user class="w-4 h-4" />

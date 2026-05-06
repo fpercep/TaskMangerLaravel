@@ -33,6 +33,7 @@
     <x-modals.create-project />
     <x-modals.edit-project />
     <x-modals.delete-project-confirmation />
+    <x-modals.manage-users />
 
 
 

@@ -1,8 +1,8 @@
 @props(['options' => [], 'model' => 'value'])
 
-<div class="relative flex-1" x-data="{ open: false }">
+<div class="relative flex-1" x-data="{ open: false }" @click.outside="open = false">
     {{-- Botón Trigger --}}
-    <button type="button" @click="open = !open" @click.outside="open = false"
+    <button type="button" @click="open = !open"
         class="w-full bg-gray-50 border border-transparent hover:bg-gray-100 text-gray-800 rounded-md px-3 py-1.5 text-sm focus:outline-none font-medium flex items-center justify-between transition-colors">
         <div class="flex items-center gap-2.5">
             <div class="w-2 h-2 rounded-full shrink-0"

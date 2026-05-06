@@ -18,6 +18,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::get('/projects/{project}/members', [App\Http\Controllers\ProjectMemberController::class, 'index'])->name('projects.members.index');
+    Route::post('/projects/{project}/members', [App\Http\Controllers\ProjectMemberController::class, 'store'])->name('projects.members.store');
+    Route::patch('/projects/{project}/members/{user}', [App\Http\Controllers\ProjectMemberController::class, 'update'])->name('projects.members.update');
+    Route::delete('/projects/{project}/members/{user}', [App\Http\Controllers\ProjectMemberController::class, 'destroy'])->name('projects.members.destroy');
+    Route::post('/projects/{project}/members/sync', [App\Http\Controllers\ProjectMemberController::class, 'sync'])->name('projects.members.sync');
+    Route::delete('/projects/{project}/members', [App\Http\Controllers\ProjectMemberController::class, 'destroyBulk'])->name('projects.members.destroy-bulk');
 
     // Rutas de Tareas
     Route::post('/projects/{project}/tasks', [TaskController::class, 'store'])->name('tasks.store');

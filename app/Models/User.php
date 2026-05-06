@@ -83,10 +83,18 @@ class User extends Authenticatable
     }
 
     /**
+     * Clave de caché para los proyectos del sidebar (versión estática para optimización).
+     */
+    public static function getSidebarCacheKeyForId($id): string
+    {
+        return "sidebar_projects_{$id}";
+    }
+
+    /**
      * Clave de caché para los proyectos del sidebar de este usuario.
      */
     public function sidebarCacheKey(): string
     {
-        return "sidebar_projects_{$this->id}";
+        return self::getSidebarCacheKeyForId($this->id);
     }
 }

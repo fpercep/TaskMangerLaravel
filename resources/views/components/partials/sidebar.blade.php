@@ -125,12 +125,20 @@
                         </button>
 
                         <!-- Dropdown Contextual Reutilizable -->
-                        <x-ui.context-menu width="w-36">
+                        <x-ui.context-menu>
+
                             <x-ui.dropdown-item 
                                 icon="pencil" 
                                 @click.stop='openMenu = false; editProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }}, {{ Js::from($proyecto->description) }})'
                             >
                                 Editar
+                            </x-ui.dropdown-item>
+
+                            <x-ui.dropdown-item 
+                                icon="user-round-cog" 
+                                @click.stop="openMenu = false; $dispatch('open-modal', { name: 'manage-users', payload: { project: {{ Js::from($proyecto) }} } })"
+                            >
+                                Usuarios
                             </x-ui.dropdown-item>
 
                             <div class="h-px bg-gray-100 my-1"></div>

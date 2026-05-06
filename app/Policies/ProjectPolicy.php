@@ -37,7 +37,7 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return $user->projects()->where('project_id', $project->id)->exists();
+        return $this->isAdministrative($user, $project);
     }
 
     /**
@@ -45,7 +45,18 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return $user->projects()->where('project_id', $project->id)->exists();
+        return $this->isAdministrative($user, $project);
+    }
+
+    /**
+     * Comprueba si el usuario tiene un rol administrativo en el proyecto.
+     */
+    private function isAdministrative(User $user, Project $project): bool
+    {
+        return $user->projects()
+            ->where('project_id', $project->id)
+            ->whereIn('role', ['admin', 'manager'])
+            ->exists();
     }
 
     /**

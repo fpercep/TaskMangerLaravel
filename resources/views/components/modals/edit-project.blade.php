@@ -1,5 +1,5 @@
 <x-ui.dialog name="edit-project" max-width="md" alpine-data="{
-    project: null,
+    project: { name: '', description: '' },
     onOpen() {
         this.$nextTick(() => this.$refs.editProjectName.focus());
     },
