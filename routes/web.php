@@ -8,16 +8,22 @@ use App\Http\Controllers\MyDayController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskStepController;
+use App\Http\Controllers\UserController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/mi-dia', [MyDayController::class, 'index'])->name('mi-dia');
 
+    Route::get('/users/search', [UserController::class, 'searchUsers'])->name('users.search');
+
+    //Rutas de Proyectos
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    //Rutas de Miembros de Proyecto
     Route::get('/projects/{project}/members', [App\Http\Controllers\ProjectMemberController::class, 'index'])->name('projects.members.index');
     Route::post('/projects/{project}/members', [App\Http\Controllers\ProjectMemberController::class, 'store'])->name('projects.members.store');
     Route::patch('/projects/{project}/members/{user}', [App\Http\Controllers\ProjectMemberController::class, 'update'])->name('projects.members.update');

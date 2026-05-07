@@ -48,17 +48,7 @@
 
                 <div class="w-full max-w-7xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 ring-1 ring-black/5 transform transition-all">
                     <!-- Header del modal -->
-                    <div class="px-5 py-2 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
-                        <div class="flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-gray-400">
-                            <x-lucide-folder class="w-4 h-4" />
-                            <span>{{ $project->name }}</span>
-                        </div>
-
-                        <button @click="show = false"
-                            class="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none">
-                            <x-lucide-x class="w-5 h-5" />
-                        </button>
-                    </div>
+                    <x-ui.modal-header :project-name="$project->name" />
 
                     <!-- Cuerpo del modal -->
                     <div class="p-8 md:p-12 min-h-[70vh] flex flex-col">

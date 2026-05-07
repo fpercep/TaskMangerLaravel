@@ -72,6 +72,19 @@ class User extends Authenticatable
     }
 
     /**
+     * Scope para buscar usuarios por nombre o email de forma segura y agrupada.
+     */
+    public function scopeSearch($query, ?string $term)
+    {
+        return $query->when($term, function ($q) use ($term) {
+            $q->where(function ($inner) use ($term) {
+                $inner->where('name', 'like', "%{$term}%")
+                      ->orWhere('email', 'like', "%{$term}%");
+            });
+        });
+    }
+
+    /**
      * Obtener las iniciales del nombre del usuario.
      */
     public function getInitialsAttribute(): string

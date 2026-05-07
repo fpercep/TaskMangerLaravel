@@ -4,88 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Services\ProjectMemberService;
+use App\Http\Resources\ProjectMemberResource;
+use App\Http\Requests\ProjectMember\StoreMemberRequest;
+use App\Http\Requests\ProjectMember\UpdateMemberRoleRequest;
+use App\Http\Requests\ProjectMember\SyncMembersRequest;
+use App\Http\Requests\ProjectMember\BulkDestroyMembersRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\JsonResponse;
 
 class ProjectMemberController extends Controller
 {
+    protected ProjectMemberService $memberService;
+
+    public function __construct(ProjectMemberService $memberService)
+    {
+        $this->memberService = $memberService;
+    }
+
     /**
      * Display a listing of the project members.
      */
-    public function index(Project $project)
+    public function index(Project $project): JsonResponse
     {
         $this->authorize('view', $project);
 
-        $members = $project->users()->get()->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'initials' => $user->initials,
-                'email' => $user->email,
-                'role' => $user->pivot->role,
-            ];
-        });
-
-        return response()->json(['data' => $members]);
+        return ProjectMemberResource::collection($project->users()->get())->response();
     }
 
     /**
      * Add a single user to the project.
      */
-    public function store(Request $request, Project $project)
+    public function store(StoreMemberRequest $request, Project $project)
     {
         $this->authorize('update', $project);
 
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'required|in:viewer,editor,manager,admin',
-        ]);
+        $validated = $request->validated();
 
-        $changes = $project->users()->syncWithoutDetaching([
-            $validated['user_id'] => ['role' => $validated['role']]
-        ]);
+        $result = $this->memberService->addMember($project, $validated['user_id'], $validated['role']);
 
-        if (empty($changes['attached'])) {
-            $message = 'El usuario ya es miembro de este proyecto.';
-            return $request->wantsJson() 
-                ? response()->json(['error' => $message], 422) 
-                : back()->with('error', $message);
-        }
-
-        Cache::forget(User::getSidebarCacheKeyForId($validated['user_id']));
-
-        $success = 'Usuario añadido correctamente.';
-        return $request->wantsJson() 
-            ? response()->json(['success' => $success]) 
-            : back()->with('success', $success);
+        return $this->handleResponse($request, $result);
     }
 
     /**
      * Update a single member's role.
      */
-    public function update(Request $request, Project $project, User $user)
+    public function update(UpdateMemberRoleRequest $request, Project $project, User $user)
     {
         $this->authorize('update', $project);
 
-        $validated = $request->validate([
-            'role' => 'required|in:viewer,editor,manager,admin',
-        ]);
+        $validated = $request->validated();
 
-        $affectedRows = $project->users()->updateExistingPivot($user->id, ['role' => $validated['role']]);
+        $result = $this->memberService->updateMemberRole($project, $user->id, $validated['role']);
 
-        if ($affectedRows > 0) {
-            Cache::forget(User::getSidebarCacheKeyForId($user->id));
-            $success = 'Rol actualizado correctamente.';
-            return $request->wantsJson() 
-                ? response()->json(['success' => $success]) 
-                : back()->with('success', $success);
-        }
-
-        $info = 'El usuario ya tenía asignado este rol.';
-        return $request->wantsJson() 
-            ? response()->json(['info' => $info]) 
-            : back()->with('info', $info);
+        return $this->handleResponse($request, $result);
     }
 
     /**
@@ -95,92 +67,53 @@ class ProjectMemberController extends Controller
     {
         $this->authorize('update', $project);
 
-        if ($user->id === Auth::id()) {
-            $error = 'No puedes eliminarte a ti mismo del proyecto.';
-            return $request->wantsJson() 
-                ? response()->json(['error' => $error], 403) 
-                : back()->with('error', $error);
-        }
+        $result = $this->memberService->removeMember($project, $user->id);
 
-        $project->users()->detach($user->id);
-
-        Cache::forget(User::getSidebarCacheKeyForId($user->id));
-
-        $success = 'Usuario eliminado del proyecto.';
-        return $request->wantsJson() 
-            ? response()->json(['success' => $success]) 
-            : back()->with('success', $success);
+        return $this->handleResponse($request, $result);
     }
 
     /**
      * Add or update multiple members' roles (Bulk).
      */
-    public function sync(Request $request, Project $project)
+    public function sync(SyncMembersRequest $request, Project $project)
     {
         $this->authorize('update', $project);
 
-        $validated = $request->validate([
-            'users' => 'required|array',
-            'users.*.user_id' => 'required|exists:users,id',
-            'users.*.role' => 'required|in:viewer,editor,manager,admin',
-        ]);
+        $validated = $request->validated();
 
-        $syncData = [];
-        foreach ($validated['users'] as $userData) {
-            $syncData[$userData['user_id']] = ['role' => $userData['role']];
-        }
+        $result = $this->memberService->syncMembers($project, $validated['users']);
 
-        $changes = $project->users()->syncWithoutDetaching($syncData);
-
-        $idsToClearCache = array_merge($changes['attached'], $changes['updated']);
-
-        if (empty($idsToClearCache)) {
-            $info = 'No se realizaron cambios. Los usuarios ya existían con los mismos roles.';
-            return $request->wantsJson() 
-                ? response()->json(['info' => $info]) 
-                : back()->with('info', $info);
-        }
-
-        foreach ($idsToClearCache as $id) {
-            Cache::forget(User::getSidebarCacheKeyForId($id));
-        }
-
-        $success = 'Usuarios procesados correctamente.';
-        return $request->wantsJson() 
-            ? response()->json(['success' => $success]) 
-            : back()->with('success', $success);
+        return $this->handleResponse($request, $result);
     }
 
     /**
      * Remove multiple users (Bulk).
      */
-    public function destroyBulk(Request $request, Project $project)
+    public function destroyBulk(BulkDestroyMembersRequest $request, Project $project)
     {
         $this->authorize('update', $project);
 
-        $validated = $request->validate([
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:users,id',
-        ]);
+        $validated = $request->validated();
 
-        $idsToRemove = array_diff($validated['user_ids'], [Auth::id()]);
+        $result = $this->memberService->removeMembersBulk($project, $validated['user_ids']);
 
-        if (empty($idsToRemove)) {
-            $error = 'No se han podido eliminar los usuarios seleccionados.';
-            return $request->wantsJson() 
-                ? response()->json(['error' => $error], 422) 
-                : back()->with('error', $error);
+        return $this->handleResponse($request, $result);
+    }
+
+    /**
+     * Handle the response based on the result array from service.
+     */
+    protected function handleResponse(Request $request, array $result)
+    {
+        $status = $result['status'] ?? (isset($result['error']) ? 400 : 200);
+        unset($result['status']);
+
+        if ($request->wantsJson()) {
+            return response()->json($result, $status);
         }
 
-        $project->users()->detach($idsToRemove);
-
-        foreach ($idsToRemove as $id) {
-            Cache::forget(User::getSidebarCacheKeyForId($id));
-        }
-
-        $success = 'Usuarios eliminados correctamente.';
-        return $request->wantsJson() 
-            ? response()->json(['success' => $success]) 
-            : back()->with('success', $success);
+        $type = isset($result['error']) ? 'error' : (isset($result['success']) ? 'success' : array_key_first($result));
+        return back()->with($type, $result[$type] ?? '');
     }
 }
+
