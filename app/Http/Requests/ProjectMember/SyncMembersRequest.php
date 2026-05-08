@@ -24,7 +24,7 @@ class SyncMembersRequest extends FormRequest
         return [
             'users' => 'required|array',
             'users.*.user_id' => 'required|exists:users,id',
-            'users.*.role' => 'required|in:viewer,editor,manager,admin',
+            'users.*.role' => 'required|in:editor,manager,admin',
         ];
     }
 }

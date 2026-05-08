@@ -23,7 +23,7 @@ class StoreMemberRequest extends FormRequest
     {
         return [
             'user_id' => 'required|exists:users,id',
-            'role' => 'required|in:viewer,editor,manager,admin',
+            'role' => 'required|in:editor,manager,admin',
         ];
     }
 }

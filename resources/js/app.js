@@ -13,12 +13,17 @@ window.Alpine = Alpine;
 import ui from './alpine/ui';
 import kanban from './alpine/kanban';
 import taskDetailModal from './alpine/task-detail-modal';
-import projectMembers from './alpine/project-members';
+import membersStore from './alpine/project-members/members-store';
+import projectMembers from './alpine/project-members/project-members';
+import userSearch from './alpine/project-members/user-search';
+
+Alpine.store('members', membersStore());
+Alpine.data('projectMembers', projectMembers);
+Alpine.data('userSearch', userSearch);
 
 ui();
 kanban();
 taskDetailModal();
-projectMembers();
 
 // Helpers globales
 Alpine.magic('formatDate', () => {

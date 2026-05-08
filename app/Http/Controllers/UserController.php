@@ -14,7 +14,7 @@ class UserController extends Controller
     {
         $users = User::select(['id', 'name', 'email'])
             ->search($request->query('search'))
-            ->limit(10)
+            ->limit(5)
             ->get();
 
         return response()->json([

@@ -38,14 +38,6 @@ class Project extends Model
     }
 
     /**
-     * Usuarios con rol viewer en el proyecto.
-     */
-    public function viewers(): BelongsToMany
-    {
-        return $this->users()->wherePivot('role', 'viewer');
-    }
-
-    /**
      * Usuarios con rol editor en el proyecto.
      */
     public function editors(): BelongsToMany
