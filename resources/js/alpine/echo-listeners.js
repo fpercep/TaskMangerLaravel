@@ -11,22 +11,52 @@ export default function echoListeners(userId) {
 
     // Escuchar en el canal privado del usuario
     window.Echo.private(`App.Models.User.${userId}`)
-        .listen('MemberRemovedFromProject', (payload) => {
+        .listen('.MemberRemovedFromProject', (payload) => {
             console.log('Evento recibido: MemberRemovedFromProject', payload);
             window.dispatchEvent(
                 new CustomEvent('project-removed', { detail: payload })
             );
         })
-        .listen('MemberAddedToProject', (payload) => {
+        .listen('.MemberAddedToProject', (payload) => {
             console.log('Evento recibido: MemberAddedToProject', payload);
             window.dispatchEvent(
                 new CustomEvent('project-added', { detail: payload })
             );
         })
-        .listen('ProjectDetailsUpdated', (payload) => {
+        .listen('.ProjectDeleted', (payload) => {
+            console.log('Evento recibido: ProjectDeleted', payload);
+            window.dispatchEvent(
+                new CustomEvent('project-removed', { detail: payload })
+            );
+        })
+        .listen('.ProjectDetailsUpdated', (payload) => {
             console.log('Evento recibido: ProjectDetailsUpdated', payload);
             window.dispatchEvent(
                 new CustomEvent('project-updated', { detail: payload })
+            );
+        })
+        .listen('.TaskCreated', (payload) => {
+            console.log('Evento recibido: TaskCreated', payload);
+            window.dispatchEvent(
+                new CustomEvent('task-created', { detail: payload })
+            );
+        })
+        .listen('.TaskUpdated', (payload) => {
+            console.log('Evento recibido: TaskUpdated', payload);
+            window.dispatchEvent(
+                new CustomEvent('task-updated', { detail: payload })
+            );
+        })
+        .listen('.TaskDeleted', (payload) => {
+            console.log('Evento recibido: TaskDeleted', payload);
+            window.dispatchEvent(
+                new CustomEvent('task-deleted', { detail: payload })
+            );
+        })
+        .listen('.TaskStepsUpdated', (payload) => {
+            console.log('Evento recibido: TaskStepsUpdated', payload);
+            window.dispatchEvent(
+                new CustomEvent('task-steps-updated', { detail: payload })
             );
         });
 }

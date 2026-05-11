@@ -4,7 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
+use App\Events\Task\TaskCreated;
+use App\Events\Task\TaskUpdated;
+use App\Events\Task\TaskDeleted;
+use App\Events\Task\TaskMoved;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +29,15 @@ class TaskController extends Controller
             'due_date' => ['nullable', 'date'],
         ]);
 
-        $project->tasks()->create($validated);
+        $task = $project->tasks()->create($validated);
+
+        // Notificar a los demás miembros
+        $memberIds = $project->users()->pluck('users.id')->toArray();
+        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+
+        if (!empty($otherMemberIds)) {
+            TaskCreated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+        }
 
         return back()->with('success', 'Tarea creada correctamente.');
     }
@@ -47,6 +61,14 @@ class TaskController extends Controller
 
         // Invalidar caché de estadísticas del dashboard
         Cache::forget('dashboard_stats_' . auth()->id());
+
+        // Notificar a los demás miembros
+        $memberIds = $task->project->users()->pluck('users.id')->toArray();
+        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+
+        if (!empty($otherMemberIds)) {
+            TaskUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+        }
 
         return response()->json([
             'message' => 'Tarea actualizada correctamente',
@@ -86,19 +108,14 @@ class TaskController extends Controller
             // Invalidar caché de estadísticas
             Cache::forget('dashboard_stats_' . auth()->id());
 
+            if (!empty($otherMemberIds)) {
+                TaskCreated::dispatch($newTask->toBroadcastArray(), $otherMemberIds);
+            }
+
             // Transformación a Array Limpio (Regla 4.4)
             return response()->json([
                 'message' => 'Tarea duplicada correctamente',
-                'task' => [
-                    'id' => $newTask->id,
-                    'name' => $newTask->name,
-                    'status' => $newTask->status,
-                    'priority' => $newTask->priority,
-                    'due_date' => $newTask->due_date,
-                    'has_description' => !empty($newTask->description),
-                    'steps_count' => $task->steps_count,
-                    'completed_steps_count' => $task->completed_steps_count,
-                ]
+                'task' => $newTask->toBroadcastArray()
             ]);
         });
     }
@@ -110,10 +127,22 @@ class TaskController extends Controller
     {
         $this->authorize('delete', $task);
 
+        $projectId = $task->project_id;
+        $taskId = $task->id;
+
+        // Obtener miembros antes de borrar
+        $memberIds = $task->project->users()->pluck('users.id')->toArray();
+
         $task->delete();
 
         // Invalidar caché de estadísticas
         Cache::forget('dashboard_stats_' . auth()->id());
+
+        // Notificar a los demás miembros
+        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+        if (!empty($otherMemberIds)) {
+            TaskDeleted::dispatch($taskId, $projectId, $otherMemberIds);
+        }
 
         return response()->json([
             'message' => 'Tarea eliminada correctamente',

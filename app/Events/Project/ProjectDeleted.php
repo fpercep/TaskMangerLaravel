@@ -1,25 +1,23 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Project;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ProjectDetailsUpdated implements ShouldBroadcastNow
+class ProjectDeleted implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @param int $projectId
-     * @param string $projectName
+     * @param int $projectId ID del proyecto eliminado.
      * @param array<int> $memberIds IDs de los miembros a notificar.
      */
     public function __construct(
         public int $projectId,
-        public string $projectName,
         public array $memberIds
     ) {}
 
@@ -33,11 +31,21 @@ class ProjectDetailsUpdated implements ShouldBroadcastNow
         })->toArray();
     }
 
+    /**
+     * Datos a enviar en el broadcast.
+     */
     public function broadcastWith(): array
     {
         return [
             'project_id' => $this->projectId,
-            'project_name' => $this->projectName,
         ];
+    }
+
+    /**
+     * Nombre del evento en el frontend.
+     */
+    public function broadcastAs(): string
+    {
+        return 'ProjectDeleted';
     }
 }

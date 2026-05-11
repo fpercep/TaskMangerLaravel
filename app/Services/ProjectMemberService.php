@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Events\MemberAddedToProject;
-use App\Events\MemberRemovedFromProject;
+use App\Events\Project\MemberAddedToProject;
+use App\Events\Project\MemberRemovedFromProject;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 

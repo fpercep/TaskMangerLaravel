@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Project;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MemberRemovedFromProject implements ShouldBroadcastNow
+class MemberRemovedFromProject implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -46,5 +46,10 @@ class MemberRemovedFromProject implements ShouldBroadcastNow
             'project_id' => $this->projectId,
             'project_name' => $this->projectName,
         ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'MemberRemovedFromProject';
     }
 }

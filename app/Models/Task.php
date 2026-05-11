@@ -96,4 +96,28 @@ class Task extends Model
             ->where('due_date', '<', today())
             ->whereNotIn('status', ['completed', 'cancelled']);
     }
+
+    /**
+     * Formatea la tarea para su envío a través de WebSockets.
+     */
+    public function toBroadcastArray(): array
+    {
+        $this->loadCount([
+            'steps',
+            'steps as completed_steps_count' => fn($q) => $q->where('is_completed', true)
+        ]);
+
+        return [
+            'id' => $this->id,
+            'project_id' => $this->project_id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'has_description' => !empty($this->description),
+            'status' => $this->status,
+            'priority' => $this->priority,
+            'due_date' => $this->due_date?->format('Y-m-d'),
+            'steps_count' => $this->steps_count ?? 0,
+            'completed_steps_count' => $this->completed_steps_count ?? 0,
+        ];
+    }
 }

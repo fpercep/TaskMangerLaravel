@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\TaskStep;
+use App\Events\Task\TaskStepsUpdated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskStepController extends Controller
 {
@@ -27,6 +29,8 @@ class TaskStepController extends Controller
             'position' => $maxPosition + 1,
         ]);
 
+        $this->notifyTaskStepsUpdated($task);
+
         return response()->json([
             'message' => 'Paso creado correctamente.',
             'step' => [
@@ -35,6 +39,19 @@ class TaskStepController extends Controller
                 'is_completed' => $step->is_completed,
             ],
         ], 201);
+    }
+
+    /**
+     * Notifica a los demás miembros del proyecto sobre cambios en los pasos.
+     */
+    private function notifyTaskStepsUpdated(Task $task)
+    {
+        $memberIds = $task->project->users()->pluck('users.id')->toArray();
+        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+
+        if (!empty($otherMemberIds)) {
+            TaskStepsUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+        }
     }
 
     /**
@@ -47,6 +64,8 @@ class TaskStepController extends Controller
         $step->update([
             'is_completed' => !$step->is_completed,
         ]);
+
+        $this->notifyTaskStepsUpdated($step->task);
 
         return response()->json([
             'message' => 'Paso actualizado.',
@@ -69,6 +88,8 @@ class TaskStepController extends Controller
             'name' => $validated['name'],
         ]);
 
+        $this->notifyTaskStepsUpdated($step->task);
+
         return response()->json([
             'message' => 'Paso actualizado.',
             'step' => [
@@ -86,7 +107,10 @@ class TaskStepController extends Controller
     {
         $this->authorize('update', $step->task);
 
+        $task = $step->task;
         $step->delete();
+
+        $this->notifyTaskStepsUpdated($task);
 
         return response()->json([
             'message' => 'Paso eliminado.',

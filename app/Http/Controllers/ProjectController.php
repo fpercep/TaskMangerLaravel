@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Events\ProjectDetailsUpdated;
+use App\Events\Project\ProjectDetailsUpdated;
+use App\Events\Project\ProjectDeleted;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use Illuminate\Support\Facades\Auth;
@@ -99,14 +100,11 @@ class ProjectController extends Controller
             'description' => $validated['description'] ?? null,
         ]);
 
-        // Limpiar caché de sidebar de TODOS los miembros (no solo el actual)
-        $memberIds = $project->users()->pluck('users.id')->toArray();
-        foreach ($memberIds as $id) {
-            Cache::forget(User::getSidebarCacheKeyForId($id));
-        }
+        // 1. Limpiar caché de sidebar de TODOS los miembros
+        $project->clearMembersSidebarCache();
 
-        // Notificar a los demás miembros del cambio
-        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+        // 2. Notificar a los demás miembros del cambio
+        $otherMemberIds = $project->getOtherMemberIds();
         if (!empty($otherMemberIds)) {
             ProjectDetailsUpdated::dispatch($project->id, $project->name, $otherMemberIds);
         }
@@ -122,10 +120,20 @@ class ProjectController extends Controller
         // Usamos el Policy para autorizar la acción
         $this->authorize('delete', $project);
 
+        $projectId = $project->id;
         $projectUrl = route('projects.show', $project);
-        $project->delete();
+        
+        // 1. Limpiar caché de sidebar de TODOS los miembros
+        $project->clearMembersSidebarCache();
 
-        Cache::forget(Auth::user()->sidebarCacheKey());
+        // 2. Notificar a los demás miembros de la eliminación (el actual ya es redirigido)
+        $otherMemberIds = $project->getOtherMemberIds();
+        if (!empty($otherMemberIds)) {
+            ProjectDeleted::dispatch($projectId, $otherMemberIds);
+        }
+
+        // 3. Eliminar el proyecto
+        $project->delete();
 
         if (url()->previous() === $projectUrl) {
             return redirect()->route('dashboard')->with('success', 'Proyecto eliminado correctamente.');

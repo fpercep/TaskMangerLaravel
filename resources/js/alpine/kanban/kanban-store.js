@@ -10,11 +10,13 @@
 export default function kanbanStore() {
     return {
         tasks: [],
+        projectId: null,
         routes: {},
         processingTaskIds: new Set(),
 
         // --- Inicialización ---
-        init(tasks, routes) {
+        init(projectId, tasks, routes) {
+            this.projectId = projectId;
             this.tasks = tasks;
             this.routes = routes;
         },
@@ -105,6 +107,25 @@ export default function kanbanStore() {
                     task[key] = detail[key];
                 }
             }
+        },
+
+        // --- Sincronización desde WebSockets (Reverb) ---
+        upsertTask(taskData) {
+            // Solo procesar si pertenece a este proyecto
+            if (taskData.project_id !== this.projectId) return;
+
+            const index = this.tasks.findIndex(t => t.id === taskData.id);
+            if (index !== -1) {
+                // Actualizar existente
+                Object.assign(this.tasks[index], taskData);
+            } else {
+                // Añadir nueva
+                this.tasks.push(taskData);
+            }
+        },
+
+        removeTask(taskId) {
+            this.tasks = this.tasks.filter(t => t.id !== taskId);
         },
     };
 }

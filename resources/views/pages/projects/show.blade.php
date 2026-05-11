@@ -17,6 +17,7 @@
         <div class="flex-1 min-h-0 w-full overflow-x-auto flex flex-col"
              x-data="kanbanBoard"
              x-init="Alpine.store('kanban').init(
+                 {{ $project->id }},
                  {{ Js::from($tasks) }},
                  {{ Js::from([
                     'update' => route('tasks.update', ['task' => ':id']),
@@ -24,7 +25,11 @@
                     'delete' => route('tasks.destroy', ['task' => ':id'])
                  ]) }}
              )"
-             @confirm-delete-task.window="deleteTask($event.detail)">
+             @confirm-delete-task.window="deleteTask($event.detail)"
+             @task-created.window="store.upsertTask($event.detail.task)"
+             @task-updated.window="store.upsertTask($event.detail.task)"
+             @task-steps-updated.window="store.upsertTask($event.detail.task)"
+             @task-deleted.window="if($event.detail.project_id === store.projectId) store.removeTask($event.detail.task_id)">
 
             <div class="min-w-max md:min-w-0 md:w-full flex-1 grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-3 py-2">
                 <x-kanban.column

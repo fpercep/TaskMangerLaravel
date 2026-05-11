@@ -93,4 +93,31 @@ class Project extends Model
                 });
         });
     }
+
+    /**
+     * Obtener los IDs de todos los miembros del proyecto.
+     */
+    public function getMemberIds(): array
+    {
+        return $this->users()->pluck('users.id')->toArray();
+    }
+
+    /**
+     * Obtener los IDs de los miembros excluyendo al usuario actual (o uno específico).
+     */
+    public function getOtherMemberIds(?int $excludeId = null): array
+    {
+        $excludeId = $excludeId ?? auth()->id();
+        return array_values(array_diff($this->getMemberIds(), [$excludeId]));
+    }
+
+    /**
+     * Limpiar la caché del sidebar para todos los miembros del proyecto.
+     */
+    public function clearMembersSidebarCache(): void
+    {
+        foreach ($this->getMemberIds() as $id) {
+            \Illuminate\Support\Facades\Cache::forget(User::getSidebarCacheKeyForId($id));
+        }
+    }
 }
