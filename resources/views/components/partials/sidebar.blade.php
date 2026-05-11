@@ -5,6 +5,9 @@
 
 <aside 
     x-data="sidebar" 
+    @project-removed.window="handleProjectRemoved($event.detail)"
+    @project-added.window="handleProjectAdded($event.detail)"
+    @project-updated.window="handleProjectUpdated($event.detail)"
     :class="collapsed ? 'w-icon-avatar-lg min-w-icon-avatar-lg' : 'w-sidebar min-w-sidebar'"
     class="h-[calc(100vh-theme(spacing.header-md))] bg-[#fdfdfd] border-r border-gray-100 flex flex-col text-gray-700 font-sans transition-all duration-300 hidden md:flex shrink-0 relative group/sidebar shadow-[rgba(0,0,0,0.02)_2px_0_8px]" 
     style="font-family: 'Inter', sans-serif;"
@@ -107,7 +110,7 @@
                     </button>
                 </div>
 
-                <div class="space-y-0.5">
+                <div class="space-y-0.5" x-ref="projectList">
                     @foreach ($proyectosSidebar as $proyecto)
                     @php
                         $isProjectActive = $activeProjectId == $proyecto->id;

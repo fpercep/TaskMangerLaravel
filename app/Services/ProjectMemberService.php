@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Events\MemberAddedToProject;
+use App\Events\MemberRemovedFromProject;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -24,6 +26,8 @@ class ProjectMemberService
         $project->users()->attach($userId, ['role' => $role]);
         
         $this->clearUserSidebarCache($userId);
+
+        MemberAddedToProject::dispatch($userId, $project->id, $project->name);
 
         return [
             'success' => 'Usuario añadido correctamente.',
@@ -58,6 +62,8 @@ class ProjectMemberService
         $project->users()->detach($userId);
         $this->clearUserSidebarCache($userId);
 
+        MemberRemovedFromProject::dispatch($userId, $project->id, $project->name);
+
         return ['success' => 'Usuario eliminado del proyecto.'];
     }
 
@@ -80,6 +86,11 @@ class ProjectMemberService
 
         foreach ($idsToClearCache as $id) {
             $this->clearUserSidebarCache($id);
+        }
+
+        // Notificar solo a los usuarios recién añadidos
+        foreach ($changes['attached'] as $attachedId) {
+            MemberAddedToProject::dispatch($attachedId, $project->id, $project->name);
         }
 
         return ['success' => 'Usuarios procesados correctamente.'];
@@ -115,6 +126,7 @@ public function removeMembersBulk(Project $project, array $userIds): array
 
         foreach ($existingUserIds as $id) {
             $this->clearUserSidebarCache($id);
+            MemberRemovedFromProject::dispatch($id, $project->id, $project->name);
         }
 
         return [

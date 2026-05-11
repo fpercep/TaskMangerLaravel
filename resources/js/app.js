@@ -10,19 +10,37 @@ Alpine.plugin(collapse);
 window.Alpine = Alpine;
 
 // Registrar componentes globales
-import ui from './alpine/ui';
-import kanban from './alpine/kanban';
+import kanbanStore from './alpine/kanban/kanban-store';
+import kanbanBoard from './alpine/kanban/kanban-board';
 import taskDetailModal from './alpine/task-detail-modal';
 import membersStore from './alpine/project-members/members-store';
 import projectMembers from './alpine/project-members/project-members';
 import userSearch from './alpine/project-members/user-search';
+import sidebar from './alpine/sidebar/sidebar';
+import echoListeners from './alpine/echo-listeners';
+
+// Módulos UI extraídos
+import accordion from './alpine/ui/accordion';
+import modalState from './alpine/ui/modal-state';
+import contextMenu from './alpine/ui/context-menu';
+import prioritySlider from './alpine/tasks/priority-slider';
+import settingsTabs from './alpine/settings/tabs';
+import layoutPanel from './alpine/layout/panel';
 
 Alpine.store('members', membersStore());
+Alpine.store('kanban', kanbanStore());
 Alpine.data('projectMembers', projectMembers);
 Alpine.data('userSearch', userSearch);
+Alpine.data('sidebar', sidebar);
 
-ui();
-kanban();
+Alpine.data('accordion', accordion);
+Alpine.data('modalState', modalState);
+Alpine.data('contextMenu', contextMenu);
+Alpine.data('prioritySlider', prioritySlider);
+Alpine.data('settingsTabs', settingsTabs);
+Alpine.data('layoutPanel', layoutPanel);
+
+Alpine.data('kanbanBoard', kanbanBoard);
 taskDetailModal();
 
 // Helpers globales
@@ -38,5 +56,8 @@ Alpine.magic('formatDate', () => {
         });
     };
 });
+
+// Inicializar listeners de WebSockets (Reverb)
+echoListeners(window.AppUserId);
 
 Alpine.start();

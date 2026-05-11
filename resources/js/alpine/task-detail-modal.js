@@ -294,13 +294,13 @@ export default () => {
             }
         },
 
-        // --- Kanban Sync ---
+        // --- Kanban Sync (via store directo) ---
         syncKanbanTask(fields) {
-            this.$dispatch('task-modal-updated', { taskId: this.task.id, ...fields });
+            Alpine.store('kanban').syncFromModal({ taskId: this.task.id, ...fields });
         },
 
         syncKanbanSteps() {
-            this.$dispatch('task-modal-updated', {
+            Alpine.store('kanban').syncFromModal({
                 taskId: this.task.id,
                 steps_count: this.task.steps.length,
                 completed_steps_count: this.completedStepsCount,

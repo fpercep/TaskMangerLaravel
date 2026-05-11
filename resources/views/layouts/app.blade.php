@@ -10,6 +10,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <script>
+        window.AppUserId = {{ auth()->id() ?? 'null' }};
+    </script>
+
     @stack('styles')
 </head>
 

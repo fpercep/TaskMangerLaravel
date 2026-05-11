@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
+use App\Events\ProjectDetailsUpdated;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use Illuminate\Support\Facades\Auth;
@@ -97,7 +99,17 @@ class ProjectController extends Controller
             'description' => $validated['description'] ?? null,
         ]);
 
-        Cache::forget(Auth::user()->sidebarCacheKey());
+        // Limpiar caché de sidebar de TODOS los miembros (no solo el actual)
+        $memberIds = $project->users()->pluck('users.id')->toArray();
+        foreach ($memberIds as $id) {
+            Cache::forget(User::getSidebarCacheKeyForId($id));
+        }
+
+        // Notificar a los demás miembros del cambio
+        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+        if (!empty($otherMemberIds)) {
+            ProjectDetailsUpdated::dispatch($project->id, $project->name, $otherMemberIds);
+        }
 
         return back()->with('success', 'Proyecto actualizado correctamente.');
     }

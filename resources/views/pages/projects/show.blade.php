@@ -15,16 +15,16 @@
 
         {{-- Cuerpo del Proyecto - Tablero Kanban --}}
         <div class="flex-1 min-h-0 w-full overflow-x-auto flex flex-col"
-             x-data="kanbanBoard(
-                 {{ Js::from($tasks) }}, 
+             x-data="kanbanBoard"
+             x-init="Alpine.store('kanban').init(
+                 {{ Js::from($tasks) }},
                  {{ Js::from([
                     'update' => route('tasks.update', ['task' => ':id']),
                     'duplicate' => route('tasks.duplicate', ['task' => ':id']),
                     'delete' => route('tasks.destroy', ['task' => ':id'])
                  ]) }}
              )"
-             @confirm-delete-task.window="deleteTask($event.detail)"
-             @task-modal-updated.window="syncTaskFromModal($event.detail)">
+             @confirm-delete-task.window="deleteTask($event.detail)">
 
             <div class="min-w-max md:min-w-0 md:w-full flex-1 grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-3 py-2">
                 <x-kanban.column
