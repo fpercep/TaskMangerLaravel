@@ -71,4 +71,5 @@
     --spacing-empty-sm: 3.75rem; /* 60px — Estado vacío pequeño (descripción) */
     --spacing-empty-md: 6.25rem; /* 100px — Estado vacío mediano (pasos/descripción) */
     --spacing-steps-min: 12.5rem; /* 200px — Altura mínima de la sección de pasos */
+    --spacing-modal-body: 70vh; /* Altura mínima del cuerpo del modal de detalle */
 }

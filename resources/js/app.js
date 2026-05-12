@@ -12,7 +12,7 @@ window.Alpine = Alpine;
 // Registrar componentes globales
 import kanbanStore from './alpine/kanban/kanban-store';
 import kanbanBoard from './alpine/kanban/kanban-board';
-import taskDetailModal from './alpine/task-detail-modal';
+import taskDetailModal from './alpine/task-detail/task-detail-modal';
 import membersStore from './alpine/project-members/members-store';
 import projectMembers from './alpine/project-members/project-members';
 import userSearch from './alpine/project-members/user-search';
@@ -41,7 +41,7 @@ Alpine.data('settingsTabs', settingsTabs);
 Alpine.data('layoutPanel', layoutPanel);
 
 Alpine.data('kanbanBoard', kanbanBoard);
-taskDetailModal();
+Alpine.data('taskDetailModal', taskDetailModal);
 
 // Helpers globales
 Alpine.magic('formatDate', () => {

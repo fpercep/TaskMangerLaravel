@@ -102,6 +102,8 @@ class Task extends Model
      */
     public function toBroadcastArray(): array
     {
+        $this->loadMissing('steps');
+        
         $this->loadCount([
             'steps',
             'steps as completed_steps_count' => fn($q) => $q->where('is_completed', true)
@@ -118,6 +120,11 @@ class Task extends Model
             'due_date' => $this->due_date?->format('Y-m-d'),
             'steps_count' => $this->steps_count ?? 0,
             'completed_steps_count' => $this->completed_steps_count ?? 0,
+            'steps' => $this->steps->map(fn($step) => [
+                'id' => $step->id,
+                'name' => $step->name,
+                'is_completed' => $step->is_completed,
+            ])->toArray(),
         ];
     }
 }

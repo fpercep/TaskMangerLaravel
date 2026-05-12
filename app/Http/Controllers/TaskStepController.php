@@ -46,8 +46,7 @@ class TaskStepController extends Controller
      */
     private function notifyTaskStepsUpdated(Task $task)
     {
-        $memberIds = $task->project->users()->pluck('users.id')->toArray();
-        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+        $otherMemberIds = $task->project->getOtherMemberIds();
 
         if (!empty($otherMemberIds)) {
             TaskStepsUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);

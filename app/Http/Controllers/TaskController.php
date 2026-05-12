@@ -32,8 +32,7 @@ class TaskController extends Controller
         $task = $project->tasks()->create($validated);
 
         // Notificar a los demás miembros
-        $memberIds = $project->users()->pluck('users.id')->toArray();
-        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+        $otherMemberIds = $project->getOtherMemberIds();
 
         if (!empty($otherMemberIds)) {
             TaskCreated::dispatch($task->toBroadcastArray(), $otherMemberIds);
@@ -63,8 +62,7 @@ class TaskController extends Controller
         Cache::forget('dashboard_stats_' . auth()->id());
 
         // Notificar a los demás miembros
-        $memberIds = $task->project->users()->pluck('users.id')->toArray();
-        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
+        $otherMemberIds = $task->project->getOtherMemberIds();
 
         if (!empty($otherMemberIds)) {
             TaskUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
@@ -131,7 +129,7 @@ class TaskController extends Controller
         $taskId = $task->id;
 
         // Obtener miembros antes de borrar
-        $memberIds = $task->project->users()->pluck('users.id')->toArray();
+        $otherMemberIds = $task->project->getOtherMemberIds();
 
         $task->delete();
 
@@ -139,7 +137,6 @@ class TaskController extends Controller
         Cache::forget('dashboard_stats_' . auth()->id());
 
         // Notificar a los demás miembros
-        $otherMemberIds = array_values(array_diff($memberIds, [Auth::id()]));
         if (!empty($otherMemberIds)) {
             TaskDeleted::dispatch($taskId, $projectId, $otherMemberIds);
         }
