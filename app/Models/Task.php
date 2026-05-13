@@ -15,6 +15,7 @@ class Task extends Model
 
     protected $fillable = [
         'project_id',
+        'assigned_user_id',
         'name',
         'description',
         'status',
@@ -48,11 +49,11 @@ class Task extends Model
     }
 
     /**
-     * Los usuarios asignados a esta tarea.
+     * El usuario asignado a esta tarea.
      */
-    public function users(): BelongsToMany
+    public function assignedUser(): BelongsTo
     {
-        return $this->belongsToMany(User::class)->withTimestamps();
+        return $this->belongsTo(User::class, 'assigned_user_id');
     }
 
     /**
@@ -102,7 +103,7 @@ class Task extends Model
      */
     public function toBroadcastArray(): array
     {
-        $this->loadMissing('steps');
+        $this->load(['steps', 'assignedUser']);
         
         $this->loadCount([
             'steps',
@@ -112,6 +113,12 @@ class Task extends Model
         return [
             'id' => $this->id,
             'project_id' => $this->project_id,
+            'assigned_user_id' => $this->assigned_user_id,
+            'assigned_user' => $this->assignedUser ? [
+                'id' => $this->assignedUser->id,
+                'name' => $this->assignedUser->name,
+                'initials' => $this->assignedUser->initials,
+            ] : null,
             'name' => $this->name,
             'description' => $this->description,
             'has_description' => !empty($this->description),

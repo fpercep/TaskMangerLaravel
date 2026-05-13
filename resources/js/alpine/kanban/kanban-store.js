@@ -97,6 +97,7 @@ export default function kanbanStore() {
                 'name', 'status', 'priority', 'due_date',
                 'description', 'has_description',
                 'steps_count', 'completed_steps_count',
+                'assigned_user_id', 'assigned_user',
             ];
 
             const task = this.taskById(detail.taskId);

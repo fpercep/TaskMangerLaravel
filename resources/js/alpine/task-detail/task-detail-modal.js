@@ -31,6 +31,7 @@ export default (routes) => ({
     descOpen: true,
     stepsOpen: true,
     assignOpen: false,
+    assignQuery: '',
     showNewStepInput: false,
     newStepName: '',
 
@@ -46,24 +47,31 @@ export default (routes) => ({
         return (this.task.steps || []).filter(s => s.is_completed).length;
     },
 
+    get filteredMembers() {
+        const query = this.assignQuery.toLowerCase().trim();
+        const members = Alpine.store('members').members || [];
+        return members.filter(m => 
+            m.name.toLowerCase().includes(query) || 
+            m.email.toLowerCase().includes(query)
+        );
+    },
+
     // --- Lifecycle ---
     handleOpen(e) {
         const cached = this.taskCache.get(e.detail.id) || {};
+        
+        // Combinamos: Datos del tablero (e.detail) + Datos en caché (cambios locales no persistidos o recibidos por WS)
         this.task = {
             ...e.detail,
-            description: cached.description ?? e.detail.description ?? '',
-            steps: cached.steps
-                ? cached.steps.map(s => ({ ...s }))
-                : (e.detail.steps || []).map(s => ({ ...s })),
+            ...cached,
         };
 
-        this.taskCache.set(this.task.id, {
-            ...cached,
-            description: this.task.description,
-            steps: this.task.steps.map(s => ({ ...s })),
-        });
+        // Aseguramos que las colecciones sean copias profundas para evitar mutaciones accidentales
+        if (this.task.steps) {
+            this.task.steps = this.task.steps.map(s => ({ ...s }));
+        }
 
-        this.originalDescription = this.task.description;
+        this.originalDescription = this.task.description || '';
         this.originalName = this.task.name;
         this.originalDate = this.task.due_date;
 
@@ -217,6 +225,35 @@ export default (routes) => ({
         }
     },
 
+    async assignUser(userId) {
+        const previousId = this.task.assigned_user_id;
+        const previousUser = this.task.assigned_user;
+        
+        // Optimistic update
+        this.task.assigned_user_id = userId;
+        this.task.assigned_user = (Alpine.store('members').members || []).find(m => m.id === userId);
+        this.assignOpen = false;
+        this.assignQuery = '';
+
+        const { ok } = await api.saveField(routes.update, this.task.id, 'assigned_user_id', userId);
+        
+        if (ok) {
+            this.updateCache({ 
+                assigned_user_id: userId,
+                assigned_user: this.task.assigned_user 
+            });
+            this.syncKanbanTask({ 
+                assigned_user_id: userId,
+                assigned_user: this.task.assigned_user 
+            });
+            this.$dispatch('notify', { message: 'Responsable asignado.', type: 'success' });
+        } else {
+            this.task.assigned_user_id = previousId;
+            this.task.assigned_user = previousUser;
+            this.$dispatch('notify', { message: 'No se pudo asignar el usuario.', type: 'error' });
+        }
+    },
+
     // =================
     //  Steps CRUD
     // =================
@@ -320,6 +357,8 @@ export default (routes) => ({
             status: updatedTask.status,
             priority: updatedTask.priority,
             due_date: updatedTask.due_date,
+            assigned_user_id: updatedTask.assigned_user_id,
+            assigned_user: updatedTask.assigned_user,
         };
 
         // Si el payload incluye steps, actualizar el array de steps también

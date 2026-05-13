@@ -9,6 +9,7 @@ use App\Events\Task\TaskCreated;
 use App\Events\Task\TaskUpdated;
 use App\Events\Task\TaskDeleted;
 use App\Events\Task\TaskMoved;
+use App\Events\Task\TaskAssigned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -54,8 +55,19 @@ class TaskController extends Controller
             'priority' => ['sometimes', 'required', 'string', 'in:low,medium,high,urgent'],
             'description' => ['sometimes', 'nullable', 'string'],
             'due_date' => ['sometimes', 'nullable', 'date'],
+            'assigned_user_id' => [
+                'sometimes',
+                'nullable',
+                'exists:users,id',
+                function ($attribute, $value, $fail) use ($task) {
+                    if ($value && !$task->project->users()->where('users.id', $value)->exists()) {
+                        $fail('El usuario asignado debe ser miembro del proyecto.');
+                    }
+                },
+            ],
         ]);
 
+        $oldAssignedId = $task->assigned_user_id;
         $task->update($validated);
 
         // Invalidar caché de estadísticas del dashboard
@@ -65,7 +77,12 @@ class TaskController extends Controller
         $otherMemberIds = $task->project->getOtherMemberIds();
 
         if (!empty($otherMemberIds)) {
-            TaskUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+            // Si el cambio fue específicamente la asignación, usamos el evento dedicado
+            if (array_key_exists('assigned_user_id', $validated) && $validated['assigned_user_id'] != $oldAssignedId) {
+                TaskAssigned::dispatch($task->toBroadcastArray(), $otherMemberIds);
+            } else {
+                TaskUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+            }
         }
 
         return response()->json([
@@ -91,6 +108,7 @@ class TaskController extends Controller
         return DB::transaction(function () use ($task) {
             // 1. Replicar la tarea base
             $newTask = $task->replicate();
+            $newTask->assigned_user_id = null;
             $newTask->save();
 
             // 2. Replicar los pasos (TaskStep)
@@ -100,12 +118,11 @@ class TaskController extends Controller
                 $newStep->save();
             }
 
-            // 3. Replicar las asignaciones de usuarios
-            $newTask->users()->sync($task->users->pluck('id'));
-
-            // Invalidar caché de estadísticas
+            // 3. Invalidar caché de estadísticas
             Cache::forget('dashboard_stats_' . auth()->id());
 
+            // 4. Notificar a los demás miembros
+            $otherMemberIds = $task->project->getOtherMemberIds();
             if (!empty($otherMemberIds)) {
                 TaskCreated::dispatch($newTask->toBroadcastArray(), $otherMemberIds);
             }

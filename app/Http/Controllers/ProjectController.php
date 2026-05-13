@@ -47,7 +47,7 @@ class ProjectController extends Controller
                 $q->where('status', '!=', 'completed')
                   ->orWhere('updated_at', '>=', now()->subDays(7));
             })
-            ->with('steps')
+            ->with(['steps', 'assignedUser'])
             ->withCount('steps')
             ->withCount(['steps as completed_steps_count' => function ($q) {
                 $q->where('is_completed', true);
@@ -76,6 +76,12 @@ class ProjectController extends Controller
                 }),
                 'steps_count' => $task->steps_count,
                 'completed_steps_count' => $task->completed_steps_count,
+                'assigned_user_id' => $task->assigned_user_id,
+                'assigned_user' => $task->assignedUser ? [
+                    'id' => $task->assignedUser->id,
+                    'name' => $task->assignedUser->name,
+                    'initials' => $task->assignedUser->initials,
+                ] : null,
             ];
         });
 

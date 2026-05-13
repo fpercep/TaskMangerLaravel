@@ -58,5 +58,11 @@ export default function echoListeners(userId) {
             window.dispatchEvent(
                 new CustomEvent('task-steps-updated', { detail: payload })
             );
+        })
+        .listen('.TaskAssigned', (payload) => {
+            console.log('Evento recibido: TaskAssigned', payload);
+            window.dispatchEvent(
+                new CustomEvent('task-assigned', { detail: payload })
+            );
         });
 }

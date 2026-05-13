@@ -66,25 +66,37 @@
             >
         </div>
     </template>
-    <div class="flex items-center gap-1 mt-1 text-xs font-light tracking-wider"
-       :class="isOverdue(task) ? 'text-red-500' : 'text-gray-400'">
-        <div class="flex items-center gap-1">
-            <x-lucide-calendar class="size-3" stroke-width="1.5" />
-            <span x-text="$formatDate(task.due_date)"></span>
-        </div>
-        
-        <template x-if="task.has_description">
-            <div class="flex items-center gap-1 ml-0.5">
-                <div class="h-2.5 w-px bg-current opacity-40"></div>
-                <x-lucide-file-text class="size-3" stroke-width="1.5" />
+    <div class="flex items-center justify-between mt-2.5">
+        <div class="flex items-center gap-1 text-xs font-light tracking-wider"
+           :class="isOverdue(task) ? 'text-red-500' : 'text-gray-400'">
+            <div class="flex items-center gap-1">
+                <x-lucide-calendar class="size-3" stroke-width="1.5" />
+                <span x-text="$formatDate(task.due_date)"></span>
             </div>
-        </template>
+            
+            <template x-if="task.has_description">
+                <div class="flex items-center gap-1 ml-0.5">
+                    <div class="h-2.5 w-px bg-current opacity-40"></div>
+                    <x-lucide-file-text class="size-3" stroke-width="1.5" />
+                </div>
+            </template>
 
-        <template x-if="task.steps_count > 0">
-            <x-tasks.steps-indicator 
-                completed="task.completed_steps_count" 
-                total="task.steps_count" 
-            />
+            <template x-if="task.steps_count > 0">
+                <x-tasks.steps-indicator 
+                    completed="task.completed_steps_count" 
+                    total="task.steps_count" 
+                />
+            </template>
+        </div>
+
+        <template x-if="task.assigned_user">
+            <div class="flex items-center gap-1.5 transition-opacity duration-200">
+                <div class="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center text-[8px] font-bold text-gray-400 border border-gray-100"
+                     x-text="task.assigned_user.initials"></div>
+                <span class="text-[10px] text-gray-400 font-medium truncate max-w-[70px]" 
+                      :title="task.assigned_user.name"
+                      x-text="task.assigned_user.name"></span>
+            </div>
         </template>
     </div>
 </div>

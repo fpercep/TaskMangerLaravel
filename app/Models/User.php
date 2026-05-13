@@ -56,9 +56,9 @@ class User extends Authenticatable
     /**
      * Las tareas asignadas al usuario.
      */
-    public function tasks(): BelongsToMany
+    public function tasks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsToMany(Task::class)->withTimestamps();
+        return $this->hasMany(Task::class, 'assigned_user_id');
     }
 
     /**

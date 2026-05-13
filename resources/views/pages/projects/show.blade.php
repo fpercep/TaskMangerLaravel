@@ -24,10 +24,11 @@
                     'duplicate' => route('tasks.duplicate', ['task' => ':id']),
                     'delete' => route('tasks.destroy', ['task' => ':id'])
                  ]) }}
-             )"
+             ); Alpine.store('members').fetch({{ $project->id }})"
              @confirm-delete-task.window="deleteTask($event.detail)"
              @task-created.window="store.upsertTask($event.detail.task)"
              @task-updated.window="store.upsertTask($event.detail.task)"
+             @task-assigned.window="store.upsertTask($event.detail.task)"
              @task-steps-updated.window="store.upsertTask($event.detail.task)"
              @task-deleted.window="if($event.detail.project_id === store.projectId) store.removeTask($event.detail.task_id)">
 

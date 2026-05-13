@@ -25,6 +25,7 @@
     })"
      @open-task-details.window="handleOpen($event)"
      @task-updated.window="handleRealtimeUpdate($event.detail.task)"
+     @task-assigned.window="handleRealtimeUpdate($event.detail.task)"
      @task-steps-updated.window="handleRealtimeUpdate($event.detail.task)"
      @task-deleted.window="handleRealtimeDelete($event.detail.task_id)"
      @keydown.escape.window="show = false">
