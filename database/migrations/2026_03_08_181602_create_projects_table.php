@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->string('status')->default('active'); // active, archived, completed, planning, etc.
             $table->string('visibility')->default('private'); // public, private
+            $table->softDeletes();
             $table->timestamps();
         });
     }
