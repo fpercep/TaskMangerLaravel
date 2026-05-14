@@ -41,7 +41,8 @@ class AppServiceProvider extends ServiceProvider
                             'id' => $project->id,
                             'name' => $project->name,
                             'description' => $project->description,
-                            'color' => $colores[$index % count($colores)]
+                            'color' => $colores[$index % count($colores)],
+                            'role' => $project->pivot?->role ?? 'editor'
                         ];
                     });
                 });

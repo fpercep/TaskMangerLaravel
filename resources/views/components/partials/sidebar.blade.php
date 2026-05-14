@@ -129,30 +129,33 @@
 
                         <!-- Dropdown Contextual Reutilizable -->
                         <x-ui.context-menu>
+                            @if(($proyecto->role ?? 'editor') === 'admin' || ($proyecto->role ?? 'editor') === 'manager')
+                                <x-ui.dropdown-item 
+                                    icon="pencil" 
+                                    @click.stop='openMenu = false; editProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }}, {{ Js::from($proyecto->description) }})'
+                                >
+                                    Editar
+                                </x-ui.dropdown-item>
 
-                            <x-ui.dropdown-item 
-                                icon="pencil" 
-                                @click.stop='openMenu = false; editProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }}, {{ Js::from($proyecto->description) }})'
-                            >
-                                Editar
-                            </x-ui.dropdown-item>
+                                <x-ui.dropdown-item 
+                                    icon="user-round-cog" 
+                                    @click.stop="openMenu = false; $dispatch('open-modal', { name: 'manage-users', payload: { project: {{ Js::from($proyecto) }} } })"
+                                >
+                                    Usuarios
+                                </x-ui.dropdown-item>
+                            @endif
 
-                            <x-ui.dropdown-item 
-                                icon="user-round-cog" 
-                                @click.stop="openMenu = false; $dispatch('open-modal', { name: 'manage-users', payload: { project: {{ Js::from($proyecto) }} } })"
-                            >
-                                Usuarios
-                            </x-ui.dropdown-item>
+                            @if(($proyecto->role ?? 'editor') === 'admin')
+                                <div class="h-px bg-gray-100 my-1"></div>
 
-                            <div class="h-px bg-gray-100 my-1"></div>
-
-                            <x-ui.dropdown-item 
-                                icon="trash-2" 
-                                :destructive="true" 
-                                @click.stop='openMenu = false; deleteProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }})'
-                            >
-                                Eliminar
-                            </x-ui.dropdown-item>
+                                <x-ui.dropdown-item 
+                                    icon="trash-2" 
+                                    :destructive="true" 
+                                    @click.stop='openMenu = false; deleteProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }})'
+                                >
+                                    Eliminar
+                                </x-ui.dropdown-item>
+                            @endif
                         </x-ui.context-menu>
                     </div>
                     @endforeach

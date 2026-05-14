@@ -16,6 +16,12 @@ class ProjectMemberService
      */
     public function addMember(Project $project, int $userId, string $role): array
     {
+        // Validación de jerarquía: solo admin puede añadir managers o admins
+        $currentUserRole = $project->users()->where('users.id', Auth::id())->first()?->pivot?->role;
+        if ($currentUserRole !== 'admin' && $role !== 'editor') {
+            return ['error' => 'Solo los administradores pueden asignar roles superiores a Editor.', 'status' => 403];
+        }
+
         if ($project->users()->where('user_id', $userId)->exists()) {
             return [
                 'error' => 'El usuario ya es miembro de este proyecto.', 
@@ -40,6 +46,16 @@ class ProjectMemberService
      */
     public function updateMemberRole(Project $project, int $userId, string $role): array
     {
+        // Validación de jerarquía
+        $currentUserRole = $project->users()->where('users.id', Auth::id())->first()?->pivot?->role;
+        $targetUserRole = $project->users()->where('users.id', $userId)->first()?->pivot?->role;
+
+        if ($currentUserRole !== 'admin') {
+            if ($targetUserRole !== 'editor' || !in_array($role, ['editor'])) {
+                return ['error' => 'No tienes permisos para asignar este rol o modificar a este usuario.', 'status' => 403];
+            }
+        }
+
         $affectedRows = $project->users()->updateExistingPivot($userId, ['role' => $role]);
 
         if ($affectedRows > 0) {
@@ -57,6 +73,14 @@ class ProjectMemberService
     {
         if ($userId === Auth::id()) {
             return ['error' => 'No puedes eliminarte a ti mismo del proyecto.', 'status' => 403];
+        }
+
+        // Validación de jerarquía
+        $currentUserRole = $project->users()->where('users.id', Auth::id())->first()?->pivot?->role;
+        $targetUserRole = $project->users()->where('users.id', $userId)->first()?->pivot?->role;
+
+        if ($currentUserRole !== 'admin' && $targetUserRole !== 'editor') {
+            return ['error' => 'No tienes permisos para eliminar a este miembro.', 'status' => 403];
         }
 
         $project->users()->detach($userId);

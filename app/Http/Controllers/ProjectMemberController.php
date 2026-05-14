@@ -37,7 +37,7 @@ class ProjectMemberController extends Controller
      */
     public function store(StoreMemberRequest $request, Project $project)
     {
-        $this->authorize('update', $project);
+        $this->authorize('manageMembers', $project);
 
         $validated = $request->validated();
 
@@ -51,7 +51,7 @@ class ProjectMemberController extends Controller
      */
     public function update(UpdateMemberRoleRequest $request, Project $project, User $user)
     {
-        $this->authorize('update', $project);
+        $this->authorize('manageMembers', $project);
 
         $validated = $request->validated();
 
@@ -65,7 +65,7 @@ class ProjectMemberController extends Controller
      */
     public function destroy(Request $request, Project $project, User $user)
     {
-        $this->authorize('update', $project);
+        $this->authorize('manageMembers', $project);
 
         $result = $this->memberService->removeMember($project, $user->id);
 
@@ -77,7 +77,7 @@ class ProjectMemberController extends Controller
      */
     public function sync(SyncMembersRequest $request, Project $project)
     {
-        $this->authorize('update', $project);
+        $this->authorize('manageMembers', $project);
 
         $validated = $request->validated();
 
@@ -91,7 +91,7 @@ class ProjectMemberController extends Controller
      */
     public function destroyBulk(BulkDestroyMembersRequest $request, Project $project)
     {
-        $this->authorize('update', $project);
+        $this->authorize('manageMembers', $project);
 
         $validated = $request->validated();
 
