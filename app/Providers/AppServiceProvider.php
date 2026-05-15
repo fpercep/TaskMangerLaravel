@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Project;
+use App\Observers\ProjectObserver;
 use Illuminate\Support\ServiceProvider;
 
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Project::observe(ProjectObserver::class);
+
         View::composer('components.partials.sidebar', function ($view) {
             $proyectosSidebar = collect([]);
             
