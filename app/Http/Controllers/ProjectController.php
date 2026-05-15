@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
+use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -47,8 +48,7 @@ class ProjectController extends Controller
         }]);
 
         return view('pages.projects.show', [
-            'project' => $project,
-            // TaskResource se encarga de todo el formateo de los datos
+            'project' => ProjectResource::make($project)->resolve(),
             'tasks' => TaskResource::collection($project->tasks)->resolve(),
         ]);
     }

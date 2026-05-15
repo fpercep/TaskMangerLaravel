@@ -4,15 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Task;
-use App\Models\User;
-use App\Events\Task\TaskCreated;
-use App\Events\Task\TaskUpdated;
-use App\Events\Task\TaskDeleted;
-use App\Events\Task\TaskMoved;
-use App\Events\Task\TaskAssigned;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
 use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
@@ -20,26 +13,11 @@ class TaskController extends Controller
     /**
      * Almacena una nueva tarea.
      */
-    public function store(Request $request, Project $project)
+    public function store(StoreTaskRequest $request, Project $project)
     {
         $this->authorize('view', $project);
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'status' => ['required', 'string', 'in:pending,in_progress,completed'],
-            'priority' => ['required', 'string', 'in:low,medium,high,urgent'],
-            'due_date' => ['nullable', 'date'],
-        ]);
-
-        $task = $project->tasks()->create($validated);
-
-        // Notificar a los demás miembros
-        $otherMemberIds = $project->getOtherMemberIds();
-
-        if (!empty($otherMemberIds)) {
-            TaskCreated::dispatch($task->toBroadcastArray(), $otherMemberIds);
-        }
+        $project->tasks()->create($request->validated());
 
         return back()->with('success', 'Tarea creada correctamente.');
     }
@@ -47,51 +25,16 @@ class TaskController extends Controller
     /**
      * Actualiza una tarea de forma genérica.
      */
-    public function update(Request $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
         $this->authorize('update', $task);
 
-        $validated = $request->validate([
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'status' => ['sometimes', 'required', 'string', 'in:pending,in_progress,completed,cancelled'],
-            'priority' => ['sometimes', 'required', 'string', 'in:low,medium,high,urgent'],
-            'description' => ['sometimes', 'nullable', 'string'],
-            'due_date' => ['sometimes', 'nullable', 'date'],
-            'assigned_user_id' => [
-                'sometimes',
-                'nullable',
-                'exists:users,id',
-                function ($attribute, $value, $fail) use ($task) {
-                    if ($value && !$task->project->users()->where('users.id', $value)->exists()) {
-                        $fail('El usuario asignado debe ser miembro del proyecto.');
-                    }
-                },
-            ],
-        ]);
-
-        $oldAssignedId = $task->assigned_user_id;
-        $task->update($validated);
-
-        // Invalidar caché de estadísticas del dashboard
-        Cache::forget('dashboard_stats_' . auth()->id());
-
-        // Notificar a los demás miembros
-        $otherMemberIds = $task->project->getOtherMemberIds();
-
-        if (!empty($otherMemberIds)) {
-            // Si el cambio fue específicamente la asignación, usamos el evento dedicado
-            if (array_key_exists('assigned_user_id', $validated) && $validated['assigned_user_id'] != $oldAssignedId) {
-                TaskAssigned::dispatch($task->toBroadcastArray(), $otherMemberIds);
-            } else {
-                TaskUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
-            }
-        }
+        $task->update($request->validated());
 
         return response()->json([
             'message' => 'Tarea actualizada correctamente',
         ]);
     }
-
 
     /**
      * Duplica una tarea (calco 1:1).
@@ -100,36 +43,22 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
 
-        // Cargamos la relación y los conteos en una sola operación encadenada.
-        // load('steps') es necesario para el foreach; loadCount para los contadores del payload.
         $task->load('steps')->loadCount([
             'steps',
             'steps as completed_steps_count' => fn($q) => $q->where('is_completed', true)
         ]);
 
         return DB::transaction(function () use ($task) {
-            // 1. Replicar la tarea base
             $newTask = $task->replicate();
             $newTask->assigned_user_id = null;
             $newTask->save();
 
-            // 2. Replicar los pasos (TaskStep)
             foreach ($task->steps as $step) {
                 $newStep = $step->replicate();
                 $newStep->task_id = $newTask->id;
                 $newStep->save();
             }
 
-            // 3. Invalidar caché de estadísticas
-            Cache::forget('dashboard_stats_' . auth()->id());
-
-            // 4. Notificar a los demás miembros
-            $otherMemberIds = $task->project->getOtherMemberIds();
-            if (!empty($otherMemberIds)) {
-                TaskCreated::dispatch($newTask->toBroadcastArray(), $otherMemberIds);
-            }
-
-            // Transformación a Array Limpio (Regla 4.4)
             return response()->json([
                 'message' => 'Tarea duplicada correctamente',
                 'task' => $newTask->toBroadcastArray()
@@ -144,22 +73,8 @@ class TaskController extends Controller
     {
         $this->authorize('delete', $task);
 
-        $projectId = $task->project_id;
-        $taskId = $task->id;
-
-        // Obtener miembros antes de borrar
-        $otherMemberIds = $task->project->getOtherMemberIds();
-
-        $task->delete();
-
-        // Invalidar caché de estadísticas
-        Cache::forget('dashboard_stats_' . auth()->id());
-
-        // Notificar a los demás miembros
-        if (!empty($otherMemberIds)) {
-            TaskDeleted::dispatch($taskId, $projectId, $otherMemberIds);
-        }
-
+        $task->delete(); 
+        
         return response()->json([
             'message' => 'Tarea eliminada correctamente',
         ]);

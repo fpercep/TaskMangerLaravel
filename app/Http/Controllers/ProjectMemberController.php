@@ -15,12 +15,9 @@ use Illuminate\Http\JsonResponse;
 
 class ProjectMemberController extends Controller
 {
-    protected ProjectMemberService $memberService;
-
-    public function __construct(ProjectMemberService $memberService)
-    {
-        $this->memberService = $memberService;
-    }
+    public function __construct(
+        protected ProjectMemberService $memberService
+    ) {}
 
     /**
      * Display a listing of the project members.
@@ -29,7 +26,7 @@ class ProjectMemberController extends Controller
     {
         $this->authorize('view', $project);
 
-        return ProjectMemberResource::collection($project->users()->get())->response();
+        return ProjectMemberResource::collection($project->users)->response();
     }
 
     /**
@@ -39,11 +36,13 @@ class ProjectMemberController extends Controller
     {
         $this->authorize('manageMembers', $project);
 
-        $validated = $request->validated();
+        $this->memberService->addMember(
+            $project, 
+            $request->validated('user_id'), 
+            $request->validated('role')
+        );
 
-        $result = $this->memberService->addMember($project, $validated['user_id'], $validated['role']);
-
-        return $this->handleResponse($request, $result);
+        return $this->respondSuccess($request, 'Miembro agregado correctamente.');
     }
 
     /**
@@ -53,11 +52,13 @@ class ProjectMemberController extends Controller
     {
         $this->authorize('manageMembers', $project);
 
-        $validated = $request->validated();
+        $this->memberService->updateMemberRole(
+            $project, 
+            $user->id, 
+            $request->validated('role')
+        );
 
-        $result = $this->memberService->updateMemberRole($project, $user->id, $validated['role']);
-
-        return $this->handleResponse($request, $result);
+        return $this->respondSuccess($request, 'Rol actualizado correctamente.');
     }
 
     /**
@@ -67,9 +68,9 @@ class ProjectMemberController extends Controller
     {
         $this->authorize('manageMembers', $project);
 
-        $result = $this->memberService->removeMember($project, $user->id);
+        $this->memberService->removeMember($project, $user->id);
 
-        return $this->handleResponse($request, $result);
+        return $this->respondSuccess($request, 'Miembro eliminado correctamente.');
     }
 
     /**
@@ -79,11 +80,9 @@ class ProjectMemberController extends Controller
     {
         $this->authorize('manageMembers', $project);
 
-        $validated = $request->validated();
+        $this->memberService->syncMembers($project, $request->validated('users'));
 
-        $result = $this->memberService->syncMembers($project, $validated['users']);
-
-        return $this->handleResponse($request, $result);
+        return $this->respondSuccess($request, 'Miembros sincronizados correctamente.');
     }
 
     /**
@@ -93,27 +92,21 @@ class ProjectMemberController extends Controller
     {
         $this->authorize('manageMembers', $project);
 
-        $validated = $request->validated();
+        $this->memberService->removeMembersBulk($project, $request->validated('user_ids'));
 
-        $result = $this->memberService->removeMembersBulk($project, $validated['user_ids']);
-
-        return $this->handleResponse($request, $result);
+        return $this->respondSuccess($request, 'Miembros eliminados correctamente.');
     }
 
     /**
-     * Handle the response based on the result array from service.
+     * Centraliza la respuesta exitosa.
      */
-    protected function handleResponse(Request $request, array $result)
+    protected function respondSuccess($request, string $message)
     {
-        $status = $result['status'] ?? (isset($result['error']) ? 400 : 200);
-        unset($result['status']);
-
         if ($request->wantsJson()) {
-            return response()->json($result, $status);
+            return response()->json(['success' => $message]);
         }
 
-        $type = isset($result['error']) ? 'error' : (isset($result['success']) ? 'success' : array_key_first($result));
-        return back()->with($type, $result[$type] ?? '');
+        return back()->with('success', $message);
     }
 }
 
