@@ -10,6 +10,7 @@ APP     = $(COMPOSE) exec app
 setup:
 	cp .env.docker .env
 	$(COMPOSE) up -d --build
+	$(APP) php artisan key:generate
 	$(APP) php artisan migrate --force
 	$(APP) php artisan db:seed
 	@echo ""

@@ -13,4 +13,8 @@ if grep -q "^APP_KEY=$" /var/www/.env 2>/dev/null; then
     php artisan key:generate
 fi
 
+# ─── Permisos de storage ──────────────────────────────────────────────────────
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
 exec "$@"

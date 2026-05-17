@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 
 # ─── Dependencias del sistema ─────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y \
@@ -26,6 +26,8 @@ WORKDIR /var/www
 # ─── Entrypoint ───────────────────────────────────────────────────────────────
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+COPY docker/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]

@@ -67,7 +67,7 @@ services:
     # --host=0.0.0.0 para escuchar en todas las interfaces del contenedor
     command: php artisan reverb:start --host=0.0.0.0 --port=8080 --debug
     ports:
-      - "8080:8080"
+      - "8081:8081"
     volumes:
       - .:/var/www
     depends_on:
