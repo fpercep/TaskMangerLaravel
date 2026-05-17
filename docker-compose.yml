@@ -1,0 +1,135 @@
+services:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # PHP-FPM — núcleo de la aplicación Laravel
+  # ─────────────────────────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskmanager_app
+    volumes:
+      - .:/var/www          # Tu código en tiempo real
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - taskmanager
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Nginx — servidor web (sustituye a Laragon/Apache)
+  # Accede en: http://localhost:8000
+  # ─────────────────────────────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: taskmanager_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - taskmanager
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Queue Worker — procesa jobs en segundo plano con Redis
+  # ─────────────────────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskmanager_worker
+    command: php artisan queue:work redis --tries=1 --sleep=0
+    volumes:
+      - .:/var/www
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - taskmanager
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Laravel Reverb — WebSockets en tiempo real
+  # Puerto 8080 expuesto para que el navegador se conecte directamente
+  # ─────────────────────────────────────────────────────────────────────────────
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskmanager_reverb
+    # --host=0.0.0.0 para escuchar en todas las interfaces del contenedor
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080 --debug
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - redis
+    networks:
+      - taskmanager
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Vite — compilación de assets con HMR (Hot Module Replacement)
+  # Accede en: http://localhost:5173
+  # ─────────────────────────────────────────────────────────────────────────────
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskmanager_vite
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/var/www
+    networks:
+      - taskmanager
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # MySQL 8.0
+  # También accesible desde tu host en localhost:3306
+  # ─────────────────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: taskmanager_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: taskmanager
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - taskmanager
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Redis 7 — caché, sesiones y cola de jobs
+  # ─────────────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: taskmanager_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - taskmanager
+
+# ─────────────────────────────────────────────────────────────────────────────
+networks:
+  taskmanager:
+    driver: bridge
+
+volumes:
+  mysql_data:    # Persiste la base de datos entre reinicios
