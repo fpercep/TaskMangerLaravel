@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->string('priority')->default('medium'); // low, medium, high, urgent
             $table->date('start_date')->nullable();
             $table->date('due_date')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -90,7 +90,7 @@
         </div>
 
         <template x-if="task.assigned_user">
-            <div class="flex items-center gap-1.5 transition-opacity duration-200">
+            <div class="flex items-center gap-1.5 transition-opacity duration-200 -mt-1">
                 <div class="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center text-[8px] font-bold text-gray-400 border border-gray-100"
                      x-text="task.assigned_user.initials"></div>
                 <span class="text-[10px] text-gray-400 font-medium truncate max-w-[70px]" 

@@ -33,11 +33,11 @@ class ProjectPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the user can update the model (settings).
      */
     public function update(User $user, Project $project): bool
     {
-        return $this->isAdministrative($user, $project);
+        return $this->hasRole($user, $project, ['admin', 'manager']);
     }
 
     /**
@@ -45,17 +45,25 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return $this->isAdministrative($user, $project);
+        return $this->hasRole($user, $project, ['admin']);
     }
 
     /**
-     * Comprueba si el usuario tiene un rol administrativo en el proyecto.
+     * Determine whether the user can manage project members.
      */
-    private function isAdministrative(User $user, Project $project): bool
+    public function manageMembers(User $user, Project $project): bool
+    {
+        return $this->hasRole($user, $project, ['admin', 'manager']);
+    }
+
+    /**
+     * Comprueba si el usuario tiene uno de los roles especificados en el proyecto.
+     */
+    private function hasRole(User $user, Project $project, array $roles): bool
     {
         return $user->projects()
             ->where('project_id', $project->id)
-            ->whereIn('role', ['admin', 'manager'])
+            ->whereIn('role', $roles)
             ->exists();
     }
 

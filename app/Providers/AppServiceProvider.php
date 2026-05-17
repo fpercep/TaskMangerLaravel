@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Project;
+use App\Models\Task;
+use App\Observers\ProjectObserver;
+use App\Observers\TaskObserver;
 use Illuminate\Support\ServiceProvider;
 
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Project::observe(ProjectObserver::class);
+        Task::observe(TaskObserver::class);
+
         View::composer('components.partials.sidebar', function ($view) {
             $proyectosSidebar = collect([]);
             
@@ -41,7 +48,8 @@ class AppServiceProvider extends ServiceProvider
                             'id' => $project->id,
                             'name' => $project->name,
                             'description' => $project->description,
-                            'color' => $colores[$index % count($colores)]
+                            'color' => $colores[$index % count($colores)],
+                            'role' => $project->pivot?->role ?? 'editor'
                         ];
                     });
                 });

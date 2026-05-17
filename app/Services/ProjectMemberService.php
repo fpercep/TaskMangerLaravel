@@ -8,138 +8,193 @@ use App\Events\Project\MemberAddedToProject;
 use App\Events\Project\MemberRemovedFromProject;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class ProjectMemberService
 {
     /**
-     * Add a single user to the project.
+     * Add a single member to the project.
      */
-    public function addMember(Project $project, int $userId, string $role): array
+    public function addMember(Project $project, int $userId, string $role): void
     {
-        if ($project->users()->where('user_id', $userId)->exists()) {
-            return [
-                'error' => 'El usuario ya es miembro de este proyecto.', 
-                'status' => 409 
-            ];
+        if (!$this->authorizeRoleAction($project, null, $role)) {
+            throw new AuthorizationException('Solo los administradores pueden asignar roles superiores a Editor.');
+        }
+
+        if ($this->getProjectRole($project, $userId)) {
+            throw ValidationException::withMessages(['user_id' => 'El usuario ya es miembro de este proyecto.']);
         }
 
         $project->users()->attach($userId, ['role' => $role]);
-        
-        $this->clearUserSidebarCache($userId);
-
-        MemberAddedToProject::dispatch($userId, $project->id, $project->name);
-
-        return [
-            'success' => 'Usuario añadido correctamente.',
-            'status' => 201
-        ];
+        $this->triggerPostActionEvents($userId, $project, 'added');
     }
 
     /**
      * Update a single member's role.
      */
-    public function updateMemberRole(Project $project, int $userId, string $role): array
+    public function updateMemberRole(Project $project, int $userId, string $role): void
     {
+        $targetUserRole = $this->getProjectRole($project, $userId);
+
+        if (!$this->authorizeRoleAction($project, $targetUserRole, $role)) {
+            throw new AuthorizationException('No tienes permisos para asignar este rol o modificar a este usuario.');
+        }
+
+        // Protección: Evita que el único admin se baje el nivel a sí mismo u otro lo haga
+        if ($targetUserRole === 'admin' && $role !== 'admin' && $this->isLastAdmin($project, $userId)) {
+            throw ValidationException::withMessages(['role' => 'No puedes quitarle el rol al único administrador del proyecto.']);
+        }
+
         $affectedRows = $project->users()->updateExistingPivot($userId, ['role' => $role]);
 
         if ($affectedRows > 0) {
             $this->clearUserSidebarCache($userId);
-            return ['success' => 'Rol actualizado correctamente.'];
         }
-
-        return ['info' => 'El usuario ya tenía asignado este rol.'];
     }
 
     /**
      * Remove a single user from the project.
      */
-    public function removeMember(Project $project, int $userId): array
+    public function removeMember(Project $project, int $userId): void
     {
         if ($userId === Auth::id()) {
-            return ['error' => 'No puedes eliminarte a ti mismo del proyecto.', 'status' => 403];
+            throw ValidationException::withMessages(['user_id' => 'No puedes eliminarte a ti mismo del proyecto.']);
+        }
+
+        $targetUserRole = $this->getProjectRole($project, $userId);
+
+        if (!$this->authorizeRoleAction($project, $targetUserRole)) {
+            throw new AuthorizationException('No tienes permisos para eliminar a este miembro.');
+        }
+
+        // Protección: Evita borrar al último admin
+        if ($targetUserRole === 'admin' && $this->isLastAdmin($project, $userId)) {
+            throw ValidationException::withMessages(['user_id' => 'No puedes eliminar al único administrador del proyecto.']);
         }
 
         $project->users()->detach($userId);
-        $this->clearUserSidebarCache($userId);
-
-        MemberRemovedFromProject::dispatch($userId, $project->id, $project->name);
-
-        return ['success' => 'Usuario eliminado del proyecto.'];
+        $this->triggerPostActionEvents($userId, $project, 'removed');
     }
 
     /**
      * Sync multiple members.
      */
-    public function syncMembers(Project $project, array $users): array
+    public function syncMembers(Project $project, array $users): void
     {
         $syncData = [];
         foreach ($users as $userData) {
-            $syncData[$userData['user_id']] = ['role' => $userData['role']];
+            $targetUserRole = $this->getProjectRole($project, $userData['user_id']);
+            
+            if ($this->authorizeRoleAction($project, $targetUserRole, $userData['role'])) {
+                // Protección durante la sincronización masiva
+                if ($targetUserRole === 'admin' && $userData['role'] !== 'admin' && $this->isLastAdmin($project, $userData['user_id'])) {
+                    throw ValidationException::withMessages(['users' => 'No puedes quitar el rol de administrador al único admin del proyecto.']);
+                }
+                
+                $syncData[$userData['user_id']] = ['role' => $userData['role']];
+            }
+        }
+
+        if (empty($syncData)) {
+            throw new AuthorizationException('No tienes permisos para procesar a estos usuarios.');
         }
 
         $changes = $project->users()->syncWithoutDetaching($syncData);
         $idsToClearCache = array_merge($changes['attached'], $changes['updated']);
 
-        if (empty($idsToClearCache)) {
-            return ['info' => 'No se realizaron cambios. Los usuarios ya existían con los mismos roles.'];
-        }
-
         foreach ($idsToClearCache as $id) {
             $this->clearUserSidebarCache($id);
         }
 
-        // Notificar solo a los usuarios recién añadidos
         foreach ($changes['attached'] as $attachedId) {
             MemberAddedToProject::dispatch($attachedId, $project->id, $project->name);
         }
-
-        return ['success' => 'Usuarios procesados correctamente.'];
     }
 
     /**
      * Remove multiple users (Bulk).
      */
-public function removeMembersBulk(Project $project, array $userIds): array
+    public function removeMembersBulk(Project $project, array $userIds): void
     {
         $idsToRemove = array_diff($userIds, [Auth::id()]);
+        $authorizedIdsToRemove = [];
 
-        if (empty($idsToRemove)) {
-            return [
-                'error' => 'No se han podido eliminar los usuarios seleccionados.', 
-                'status' => 422
-            ];
+        foreach ($idsToRemove as $userId) {
+            $targetUserRole = $this->getProjectRole($project, $userId);
+            
+            // Ignoramos al último admin en eliminación masiva
+            if ($targetUserRole === 'admin' && $this->isLastAdmin($project, $userId)) {
+                continue; 
+            }
+
+            if ($targetUserRole && $this->authorizeRoleAction($project, $targetUserRole)) {
+                $authorizedIdsToRemove[] = $userId;
+            }
         }
 
-        $existingUserIds = $project->users()
-            ->whereIn('users.id', $idsToRemove)
-            ->pluck('users.id')
-            ->toArray();
-
-        if (empty($existingUserIds)) {
-            return [
-                'info' => 'Los usuarios seleccionados no formaban parte del proyecto.',
-                'status' => 404
-            ];
+        if (empty($authorizedIdsToRemove)) {
+            throw ValidationException::withMessages(['user_ids' => 'No se han podido eliminar los usuarios seleccionados o faltan permisos.']);
         }
 
-        $project->users()->detach($existingUserIds);
+        $project->users()->detach($authorizedIdsToRemove);
 
-        foreach ($existingUserIds as $id) {
-            $this->clearUserSidebarCache($id);
-            MemberRemovedFromProject::dispatch($id, $project->id, $project->name);
+        foreach ($authorizedIdsToRemove as $id) {
+            $this->triggerPostActionEvents($id, $project, 'removed');
         }
-
-        return [
-            'success' => 'Usuarios eliminados correctamente.', 
-            'status' => 200
-        ];
     }
 
-    /**
-     * Clear the sidebar cache for a user.
-     */
-    protected function clearUserSidebarCache(int $userId): void
+    // =========================================================================
+    // MÉTODOS PRIVADOS DE SOPORTE
+    // =========================================================================
+
+    private function getProjectRole(Project $project, int $userId): ?string
+    {
+        return $project->users()->where('users.id', $userId)->value('project_user.role');
+    }
+
+    private function authorizeRoleAction(Project $project, ?string $targetRole = null, ?string $newRole = null): bool
+    {
+        $currentUserRole = $this->getProjectRole($project, Auth::id());
+
+        if ($currentUserRole === 'admin') {
+            return true;
+        }
+
+        if ($targetRole && $targetRole !== 'editor') {
+            return false;
+        }
+
+        if ($newRole && $newRole !== 'editor') {
+            return false;
+        }
+
+        return !is_null($currentUserRole);
+    }
+
+    private function triggerPostActionEvents(int $userId, Project $project, string $action): void
+    {
+        $this->clearUserSidebarCache($userId);
+
+        if ($action === 'added') {
+            MemberAddedToProject::dispatch($userId, $project->id, $project->name);
+        } elseif ($action === 'removed') {
+            MemberRemovedFromProject::dispatch($userId, $project->id, $project->name);
+        }
+    }
+
+    private function clearUserSidebarCache(int $userId): void
     {
         Cache::forget(User::getSidebarCacheKeyForId($userId));
+    }
+
+    protected function isLastAdmin(Project $project, int $userId): bool
+    {
+        $adminIds = $project->users()
+            ->wherePivot('role', 'admin')
+            ->limit(2)
+            ->pluck('users.id');
+
+        return $adminIds->count() === 1 && $adminIds->first() === $userId;
     }
 }
