@@ -2,7 +2,7 @@
 set -e
 
 # ─── Auto-instala dependencias PHP si no existen ──────────────────────────────
-if [ ! -d "/var/www/vendor" ]; then
+if [ ! -f "/var/www/vendor/autoload.php" ]; then
     echo "📦 Instalando dependencias de Composer..."
     composer install --no-interaction --prefer-dist
 fi

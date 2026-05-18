@@ -48,7 +48,7 @@ class ProjectController extends Controller
         }]);
 
         return view('pages.projects.show', [
-            'project' => ProjectResource::make($project)->resolve(),
+            'project' => $project,
             'tasks' => TaskResource::collection($project->tasks)->resolve(),
         ]);
     }
