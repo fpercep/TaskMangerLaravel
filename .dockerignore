@@ -1,0 +1,40 @@
+# ─── Excluir del contexto de build de Docker ─────────────────────────────────
+# Reduce el envío al daemon de ~400MB a ~5MB
+
+.git
+node_modules
+vendor
+
+# Storage runtime
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+
+# Entornos y secretos
+.env
+.env.backup
+.env.production
+
+# Build artifacts
+public/build
+public/hot
+public/storage
+
+# IDE y herramientas
+.idea
+.vscode
+.fleet
+.zed
+.nova
+.agents
+
+# Tests y documentación
+tests
+*.md
+!docker/
+
+# Otros
+Thumbs.db
+.DS_Store
+.phpunit.cache

@@ -10,6 +10,8 @@ APP     = $(COMPOSE) exec app
 setup:
 	cp .env.docker .env
 	$(COMPOSE) up -d --build
+	@echo "⏳ Esperando a que el contenedor app esté listo..."
+	@until $(COMPOSE) exec -T app php -r "require '/var/www/vendor/autoload.php';" 2>/dev/null; do sleep 2; done
 	$(APP) php artisan key:generate
 	$(APP) php artisan migrate --force
 	$(APP) php artisan db:seed

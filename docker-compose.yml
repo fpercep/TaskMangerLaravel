@@ -8,6 +8,13 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: taskmanager_app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "php", "-r", "require '/var/www/vendor/autoload.php';"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
     volumes:
       - .:/var/www          # Tu código en tiempo real
     depends_on:
@@ -25,6 +32,7 @@ services:
   nginx:
     image: nginx:alpine
     container_name: taskmanager_nginx
+    restart: unless-stopped
     ports:
       - "8000:80"
     volumes:
@@ -43,11 +51,11 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: taskmanager_worker
-    command: php artisan queue:work redis --tries=1 --sleep=0
+    command: php artisan queue:work redis --tries=3 --sleep=3 --backoff=5 --max-time=3600
     volumes:
       - .:/var/www
     depends_on:
-      mysql:
+      app:
         condition: service_healthy
       redis:
         condition: service_started
@@ -67,11 +75,14 @@ services:
     # --host=0.0.0.0 para escuchar en todas las interfaces del contenedor
     command: php artisan reverb:start --host=0.0.0.0 --port=8080 --debug
     ports:
-      - "8081:8081"
+      - "8080:8080"
     volumes:
       - .:/var/www
     depends_on:
-      - redis
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - taskmanager
     restart: unless-stopped
@@ -90,6 +101,9 @@ services:
       - "5173:5173"
     volumes:
       - .:/var/www
+    depends_on:
+      app:
+        condition: service_healthy
     networks:
       - taskmanager
 
