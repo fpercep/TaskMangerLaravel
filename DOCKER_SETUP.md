@@ -1,227 +1,149 @@
-# TaskManager — Guía de despliegue con Docker (WSL + Docker Desktop)
+# 🐳 TaskManager — Guía Docker
 
 ## Requisitos previos
 
-- **Docker Desktop** instalado y corriendo en Windows
-- **WSL 2** habilitado (integración activada en Docker Desktop → Settings → Resources → WSL Integration)
-- **Make** instalado en WSL (opcional): `sudo apt install make`
-- Tu proyecto clonado dentro de WSL: `~/TaskMangerLaravel`
+- **Docker Desktop** corriendo
+- **Make** disponible en tu terminal
 
-> ⚠️ **Importante:** Trabaja siempre desde la terminal WSL, no desde PowerShell.
-> El rendimiento de volúmenes en WSL2 es mucho mejor que en rutas de Windows (`/mnt/c/...`).
->
-> 💡 **VS Code:** Instala la extensión "WSL" y abre el proyecto con `WSL: Open Folder in WSL`.
-> Editarás archivos de WSL exactamente igual que cualquier otro proyecto.
+| Entorno | Instalar Make |
+|---|---|
+| Windows + WSL 2 (recomendado) | `sudo apt install make` |
+| Windows PowerShell | `winget install GnuWin32.Make` |
+| Linux / Mac | Ya viene instalado |
 
----
+> 💡 **Windows:** Trabaja siempre desde WSL 2, no desde PowerShell. El rendimiento
+> de volúmenes es 3-5x mejor. Instala la extensión "WSL" en VS Code para editar
+> archivos de WSL directamente desde Windows.
 
-## Estructura de archivos Docker en el proyecto
-
-```
-TaskMangerLaravel/
-├── Dockerfile                  ← Imagen PHP 8.4 con todas las extensiones
-├── docker-compose.yml          ← Los 7 servicios del stack
-├── .dockerignore               ← Evita copiar vendor/, node_modules/, etc.
-├── .env.docker                 ← Template .env adaptado para Docker
-├── .env.example                ← Template .env para entorno tradicional (Laragon/XAMPP)
-├── vite.config.js              ← MODIFICADO: añade config HMR para Docker
-├── Makefile                    ← Atajos de comandos (opcional)
-└── docker/
-    ├── entrypoint.sh           ← Script de arranque del contenedor PHP
-    ├── php-fpm/
-    │   └── www.conf            ← PHP-FPM escucha en 0.0.0.0:9000
-    └── nginx/
-        └── default.conf        ← Configuración de Nginx para Laravel
-```
+> ⚠️ **Linux / WSL:** Si Docker da error de permisos, ejecuta una sola vez:
+> `sudo usermod -aG docker $USER` y reinicia la terminal.
 
 ---
 
-## Primera puesta en marcha
-
-### Con Make
+## Primera puesta en marcha (solo una vez)
 
 ```bash
 make setup
 ```
 
-### Sin Make
-
-```bash
-cp .env.docker .env
-docker compose up -d --build
-# Esperar a que el contenedor app complete composer install (~1 min primera vez)
-until docker compose exec -T app php -r "require '/var/www/vendor/autoload.php';" 2>/dev/null; do sleep 2; done
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --force
-docker compose exec app php artisan db:seed
-```
-
-> El setup construye las imágenes, arranca los contenedores, genera el APP_KEY,
-> ejecuta las migraciones y los seeders. Solo se hace una vez.
-
 ### ✅ Resultado esperado
 
-| Servicio           | URL                   |
-| ------------------ | --------------------- |
+| Servicio | URL |
+|---|---|
 | Aplicación Laravel | http://localhost:8000 |
-| Vite HMR           | http://localhost:5173 |
-| Reverb WebSockets  | ws://localhost:8080   |
-| MySQL              | localhost:3306        |
-| Redis              | localhost:6379        |
+| Vite HMR | http://localhost:5173 |
+| Reverb WebSockets | ws://localhost:8080 |
+| MySQL | localhost:3306 |
+| Redis | localhost:6379 |
 
 ---
 
 ## Uso diario
 
-| Acción                     | Con Make               | Sin Make                                                     |
-| -------------------------- | ---------------------- | ------------------------------------------------------------ |
-| Arrancar el stack          | `make up`              | `docker compose up -d`                                       |
-| Arrancar con logs          | `make up-logs`         | `docker compose up`                                          |
-| Parar todo                 | `make down`            | `docker compose down`                                        |
-| Entrar al contenedor PHP   | `make shell`           | `docker compose exec app bash`                               |
-| Ejecutar migraciones       | `make migrate`         | `docker compose exec app php artisan migrate`                |
-| Migraciones + seeders      | `make seed`            | `docker compose exec app php artisan migrate:fresh --seed`   |
-| Limpiar caché              | `make cache-clear`     | `docker compose exec app php artisan cache:clear`            |
-| Tinker                     | `make tinker`          | `docker compose exec app php artisan tinker`                 |
-| Ver todos los logs         | `make logs`            | `docker compose logs -f`                                     |
-| Ver logs de un servicio    | `make logs-s s=worker` | `docker compose logs -f worker`                              |
-| Abrir MySQL CLI            | `make mysql`           | `docker compose exec mysql mysql -u root -proot taskmanager` |
-| Ver estado contenedores    | `make ps`              | `docker compose ps`                                          |
-| Reconstruir imágenes       | `make rebuild`         | `docker compose up -d --build`                               |
-| Reset completo ⚠️ borra BD | `make reset`           | `docker compose down -v`                                     |
+```bash
+make up      # Arrancar
+make down    # Parar
+```
+
+### Referencia de comandos
+
+| Acción | Comando |
+|---|---|
+| Arrancar con logs | `make up-logs` |
+| Entrar al contenedor PHP | `make shell` |
+| Migraciones | `make migrate` |
+| Migraciones + seeders | `make seed` |
+| Limpiar caché | `make cache-clear` |
+| Tinker | `make tinker` |
+| Instalar paquete Composer | `make composer-require pkg=vendor/paquete` |
+| Logs de todos los servicios | `make logs` |
+| Logs de un servicio | `make logs-s s=worker` |
+| MySQL CLI | `make mysql` |
+| Estado de contenedores | `make ps` |
+| Reconstruir imágenes | `make rebuild` |
+| Reset completo ⚠️ borra BD | `make reset` |
 
 ---
 
-## Diferencias clave respecto a Laragon
+## Estructura Docker
 
-| Concepto     | Laragon           | Docker                             |
-| ------------ | ----------------- | ---------------------------------- |
-| Servidor web | Apache            | Nginx (contenedor)                 |
-| PHP          | Global en Windows | PHP 8.4 aislado en contenedor      |
-| MySQL        | Servicio Windows  | Contenedor con volumen persistente |
-| Redis        | Manual            | Contenedor incluido                |
-| Queue worker | `composer dev`    | Contenedor `worker` siempre activo |
-| Reverb       | `composer dev`    | Contenedor `reverb` siempre activo |
-| Vite HMR     | `composer dev`    | Contenedor `vite` siempre activo   |
+```
+TaskMangerLaravel/
+├── Dockerfile                  ← PHP 8.4 con todas las extensiones
+├── docker-compose.yml          ← 7 servicios: app, nginx, worker, reverb, vite, mysql, redis
+├── .dockerignore
+├── .env.docker                 ← Template .env para Docker
+├── .env.example                ← Template .env para Laragon/XAMPP
+├── vite.config.js              ← Modificado para HMR en Docker
+├── Makefile
+└── docker/
+    ├── entrypoint.sh
+    ├── php-fpm/www.conf        ← PHP-FPM escucha en 0.0.0.0:9000
+    └── nginx/default.conf
+```
 
 ---
 
-## Cambios en tu código existente
+## Diferencias respecto a Laragon
 
-### `vite.config.js`
+| | Laragon | Docker |
+|---|---|---|
+| Servidor web | Apache | Nginx |
+| PHP | Global en Windows | Aislado en contenedor |
+| MySQL / Redis | Manual | Contenedor incluido |
+| Queue worker / Reverb / Vite | `composer dev` | Contenedor siempre activo |
 
-Añadida la sección `server` con `host: '0.0.0.0'` y `hmr.host: 'localhost'`.
-Sin esto el Hot Module Replacement no funciona desde Docker Desktop.
-
-### `.env`
-
-Las diferencias principales respecto a tu `.env` de Laragon:
+### Cambios en `.env`
 
 ```dotenv
-# En Laragon              →  En Docker
-DB_HOST=127.0.0.1         →  DB_HOST=mysql
-DB_PASSWORD=              →  DB_PASSWORD=root
-REDIS_HOST=127.0.0.1      →  REDIS_HOST=redis
-REDIS_CLIENT=predis        →  REDIS_CLIENT=phpredis (Docker instala la extensión C)
-CACHE_STORE=database       →  CACHE_STORE=redis (aprovecha Redis del stack)
-APP_URL=http://localhost   →  APP_URL=http://localhost:8000
-REVERB_HOST=localhost      →  REVERB_HOST=localhost (el navegador conecta a localhost)
+DB_HOST=mysql                        # Antes: 127.0.0.1
+DB_PASSWORD=root                     # Antes: vacío
+REDIS_HOST=redis                     # Antes: 127.0.0.1
+APP_URL=http://localhost:8000        # Antes: http://localhost
+REVERB_HOST=localhost
+REVERB_HOST_INTERNAL=reverb          # El backend conecta al contenedor directamente
 ```
 
 ---
 
-## Solución de problemas frecuentes
+## Solución de problemas
 
-### Docker no arranca (`Cannot connect to Docker daemon`)
+### Docker no responde
+Docker Desktop no está corriendo. Ábrelo, espera a que el icono esté en verde y verifica con `docker info`.
 
-Docker Desktop no está corriendo en Windows.
-Ábrelo y espera a que el icono de la ballena esté en verde, luego verifica:
-
+### Puerto en uso (`port is already allocated`)
 ```bash
-docker info
-```
-
-### Puerto ya en uso (`port is already allocated`)
-
-Algún proceso ocupa el puerto. Averigua cuál:
-
-```bash
-sudo lsof -i :8080   # o el puerto que falle
-```
-
-Si es un contenedor antiguo:
-
-```bash
-docker compose down
+sudo lsof -i :8080    # Averigua qué proceso ocupa el puerto
+docker compose down   # Si es un contenedor antiguo
 make up
 ```
 
-### El contenedor `app` falla al arrancar
-
+### Permisos en `storage/`
 ```bash
-docker compose logs app
-# Si hay error de permisos en storage/:
 docker compose exec app chmod -R 775 storage bootstrap/cache
 docker compose exec app chown -R www-data:www-data storage bootstrap/cache
 ```
 
-### 502 Bad Gateway en http://localhost:8000
-
-PHP-FPM no escucha en todas las interfaces. Verifica que existe `docker/php-fpm/www.conf`
-con `listen = 0.0.0.0:9000` y que el `Dockerfile` lo copia correctamente.
-Luego reconstruye:
-
+### 502 Bad Gateway
+Reconstruye desde cero:
 ```bash
-make reset
-make setup
+make reset && make setup
 ```
 
-### `MissingAppKeyException` (No application encryption key)
-
-El APP_KEY está vacío en el `.env`:
-
+### `MissingAppKeyException`
 ```bash
-# Con Make
 make shell
 php artisan key:generate
-
-# Sin Make
-docker compose exec app php artisan key:generate
 ```
 
-### Vite no conecta (pantalla en blanco o assets rotos)
-
-```bash
-docker compose logs vite
-# Asegúrate de que vite.config.js tiene la sección server con host: '0.0.0.0'
-```
+### Vite no conecta
+Verifica que `vite.config.js` tiene `server.host: '0.0.0.0'`.
 
 ### Reverb no conecta
+Verifica en `.env` que `REVERB_HOST=localhost` y `REVERB_HOST_INTERNAL=reverb`.
 
-```bash
-docker compose logs reverb
-# Verifica en .env que REVERB_HOST=localhost (no el nombre del contenedor)
-# El navegador conecta a localhost, no dentro de la red Docker
-```
-
-### Regenerar todo desde cero (⚠️ borra la BD)
-
-Con Make:
-
+### Reset completo
 ```bash
 make reset
 make setup
-```
-
-Sin Make:
-
-```bash
-docker compose down -v
-cp .env.docker .env
-docker compose up -d --build
-# Esperar a que el contenedor app complete composer install
-until docker compose exec -T app php -r "require '/var/www/vendor/autoload.php';" 2>/dev/null; do sleep 2; done
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --force
-docker compose exec app php artisan db:seed
 ```
