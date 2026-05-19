@@ -5,6 +5,7 @@ export default function userSearch() {
         isSearching: false,
         showPanel: false,
         clearTimeout: null,
+        timeout: null,
 
         init() {
             this.$watch('query', () => {

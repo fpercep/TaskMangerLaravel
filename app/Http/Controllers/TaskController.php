@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\TaskBroadcastResource;
 
 class TaskController extends Controller
 {
@@ -61,7 +62,7 @@ class TaskController extends Controller
 
             return response()->json([
                 'message' => 'Tarea duplicada correctamente',
-                'task' => $newTask->toBroadcastArray()
+                'task' => TaskBroadcastResource::make($newTask)->resolve()
             ]);
         });
     }

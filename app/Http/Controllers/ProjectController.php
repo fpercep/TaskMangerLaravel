@@ -8,7 +8,7 @@ use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use App\Services\SidebarCacheService;
 
 class ProjectController extends Controller
 {
@@ -26,7 +26,7 @@ class ProjectController extends Controller
             'visibility' => 'private',
         ], ['role' => 'admin']);
 
-        Cache::forget(Auth::user()->sidebarCacheKey());
+        SidebarCacheService::forget(Auth::id());
 
         return back()->with('success', 'Proyecto creado correctamente.');
     }

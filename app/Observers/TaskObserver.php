@@ -8,6 +8,7 @@ use App\Events\Task\TaskUpdated;
 use App\Events\Task\TaskDeleted;
 use App\Events\Task\TaskAssigned;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Resources\TaskBroadcastResource;
 
 class TaskObserver
 {
@@ -17,10 +18,10 @@ class TaskObserver
     public function created(Task $task): void
     {
         // Obtenemos a quién notificar
-        $otherMemberIds = $task->project->getOtherMemberIds();
+        $otherMemberIds = $task->project->getOtherMemberIds(auth()->id());
         
         if (!empty($otherMemberIds)) {
-            TaskCreated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+            TaskCreated::dispatch(TaskBroadcastResource::make($task)->resolve(), $otherMemberIds);
         }
     }
 
@@ -36,14 +37,14 @@ class TaskObserver
         }
 
         // 2. Notificar a los demás miembros
-        $otherMemberIds = $task->project->getOtherMemberIds();
+        $otherMemberIds = $task->project->getOtherMemberIds(auth()->id());
         
         if (!empty($otherMemberIds)) {
             // El método nativo isDirty() verifica si un campo específico cambió en esta actualización exacta
             if ($task->isDirty('assigned_user_id')) {
-                TaskAssigned::dispatch($task->toBroadcastArray(), $otherMemberIds);
+                TaskAssigned::dispatch(TaskBroadcastResource::make($task)->resolve(), $otherMemberIds);
             } else {
-                TaskUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+                TaskUpdated::dispatch(TaskBroadcastResource::make($task)->resolve(), $otherMemberIds);
             }
         }
     }
@@ -59,7 +60,7 @@ class TaskObserver
         }
 
         // 2. Notificar eliminación
-        $otherMemberIds = $task->project->getOtherMemberIds();
+        $otherMemberIds = $task->project->getOtherMemberIds(auth()->id());
         
         if (!empty($otherMemberIds)) {
             TaskDeleted::dispatch($task->id, $task->project_id, $otherMemberIds);

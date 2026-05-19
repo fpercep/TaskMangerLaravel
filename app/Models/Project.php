@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
 
 class Project extends Model
 {
@@ -86,11 +85,8 @@ class Project extends Model
     {
         return $query->where(function ($q) use ($user) {
             $q->where('visibility', 'public')
-                ->orWhereExists(function ($subquery) use ($user) {
-                    $subquery->select(DB::raw(1))
-                        ->from('project_user')
-                        ->whereColumn('project_user.project_id', 'projects.id')
-                        ->where('project_user.user_id', $user->id);
+                ->orWhereHas('users', function ($q) use ($user) {
+                    $q->where('users.id', $user->id);
                 });
         });
     }
@@ -103,22 +99,14 @@ class Project extends Model
         return $this->users()->pluck('users.id')->toArray();
     }
 
-    /**
-     * Obtener los IDs de los miembros excluyendo al usuario actual (o uno específico).
-     */
     public function getOtherMemberIds(?int $excludeId = null): array
     {
-        $excludeId = $excludeId ?? auth()->id();
-        return array_values(array_diff($this->getMemberIds(), [$excludeId]));
-    }
-
-    /**
-     * Limpiar la caché del sidebar para todos los miembros del proyecto.
-     */
-    public function clearMembersSidebarCache(): void
-    {
-        foreach ($this->getMemberIds() as $id) {
-            \Illuminate\Support\Facades\Cache::forget(User::getSidebarCacheKeyForId($id));
+        $excludeId = func_num_args() > 0 ? $excludeId : auth()->id();
+        
+        if ($excludeId) {
+            return array_values(array_diff($this->getMemberIds(), [$excludeId]));
         }
+
+        return $this->getMemberIds();
     }
 }

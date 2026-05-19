@@ -84,30 +84,11 @@ class User extends Authenticatable
         });
     }
 
-    /**
-     * Obtener las iniciales del nombre del usuario.
-     */
     public function getInitialsAttribute(): string
     {
         return collect(explode(' ', $this->name))
             ->map(fn($n) => mb_substr($n, 0, 1))
             ->take(2)
             ->implode('');
-    }
-
-    /**
-     * Clave de caché para los proyectos del sidebar (versión estática para optimización).
-     */
-    public static function getSidebarCacheKeyForId($id): string
-    {
-        return "sidebar_projects_{$id}";
-    }
-
-    /**
-     * Clave de caché para los proyectos del sidebar de este usuario.
-     */
-    public function sidebarCacheKey(): string
-    {
-        return self::getSidebarCacheKeyForId($this->id);
     }
 }

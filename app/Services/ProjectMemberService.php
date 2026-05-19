@@ -3,11 +3,10 @@
 namespace App\Services;
 
 use App\Models\Project;
-use App\Models\User;
 use App\Events\Project\MemberAddedToProject;
 use App\Events\Project\MemberRemovedFromProject;
+use App\Services\SidebarCacheService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -49,7 +48,7 @@ class ProjectMemberService
         $affectedRows = $project->users()->updateExistingPivot($userId, ['role' => $role]);
 
         if ($affectedRows > 0) {
-            $this->clearUserSidebarCache($userId);
+            SidebarCacheService::forget($userId);
         }
     }
 
@@ -104,7 +103,7 @@ class ProjectMemberService
         $idsToClearCache = array_merge($changes['attached'], $changes['updated']);
 
         foreach ($idsToClearCache as $id) {
-            $this->clearUserSidebarCache($id);
+            SidebarCacheService::forget($id);
         }
 
         foreach ($changes['attached'] as $attachedId) {
@@ -174,18 +173,13 @@ class ProjectMemberService
 
     private function triggerPostActionEvents(int $userId, Project $project, string $action): void
     {
-        $this->clearUserSidebarCache($userId);
+        SidebarCacheService::forget($userId);
 
         if ($action === 'added') {
             MemberAddedToProject::dispatch($userId, $project->id, $project->name);
         } elseif ($action === 'removed') {
             MemberRemovedFromProject::dispatch($userId, $project->id, $project->name);
         }
-    }
-
-    private function clearUserSidebarCache(int $userId): void
-    {
-        Cache::forget(User::getSidebarCacheKeyForId($userId));
     }
 
     protected function isLastAdmin(Project $project, int $userId): bool

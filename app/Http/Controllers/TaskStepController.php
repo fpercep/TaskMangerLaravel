@@ -7,6 +7,7 @@ use App\Models\TaskStep;
 use App\Events\Task\TaskStepsUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\TaskBroadcastResource;
 
 class TaskStepController extends Controller
 {
@@ -46,10 +47,10 @@ class TaskStepController extends Controller
      */
     private function notifyTaskStepsUpdated(Task $task)
     {
-        $otherMemberIds = $task->project->getOtherMemberIds();
+        $otherMemberIds = $task->project->getOtherMemberIds(auth()->id());
 
         if (!empty($otherMemberIds)) {
-            TaskStepsUpdated::dispatch($task->toBroadcastArray(), $otherMemberIds);
+            TaskStepsUpdated::dispatch(TaskBroadcastResource::make($task)->resolve(), $otherMemberIds);
         }
     }
 

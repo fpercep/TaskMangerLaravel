@@ -9,8 +9,8 @@ use App\Observers\TaskObserver;
 use Illuminate\Support\ServiceProvider;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
+use App\Services\SidebarCacheService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,9 +35,8 @@ class AppServiceProvider extends ServiceProvider
             
             if (Auth::check()) {
                 $user = Auth::user();
-                $cacheKey = $user->sidebarCacheKey();
                 
-                $proyectosSidebar = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($user) {
+                $proyectosSidebar = SidebarCacheService::remember($user->id, function () use ($user) {
                     // Obtener proyectos directamente cargados por el usuario
                     $proyectos = $user->projects()->get();
                     $colores = ['bg-emerald-400', 'bg-indigo-400', 'bg-orange-400', 'bg-rose-400', 'bg-sky-400'];

@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Project;
 use App\Events\Project\ProjectDetailsUpdated;
 use App\Events\Project\ProjectDeleted;
+use App\Services\SidebarCacheService;
 
 class ProjectObserver
 {
@@ -14,10 +15,10 @@ class ProjectObserver
     public function updated(Project $project): void
     {
         // 1. Limpiar caché de todos los miembros
-        $project->clearMembersSidebarCache();
+        SidebarCacheService::forgetForMembers($project->getMemberIds());
 
         // 2. Notificar a los demás miembros
-        $otherMemberIds = $project->getOtherMemberIds();
+        $otherMemberIds = $project->getOtherMemberIds(auth()->id());
         if (!empty($otherMemberIds)) {
             ProjectDetailsUpdated::dispatch(
                 $project->id, 
@@ -33,10 +34,10 @@ class ProjectObserver
     public function deleted(Project $project): void
     {
         // 1. Limpiar caché
-        $project->clearMembersSidebarCache();
+        SidebarCacheService::forgetForMembers($project->getMemberIds());
 
         // 2. Notificar eliminación
-        $otherMemberIds = $project->getOtherMemberIds();
+        $otherMemberIds = $project->getOtherMemberIds(auth()->id());
         if (!empty($otherMemberIds)) {
             ProjectDeleted::dispatch($project->id, $otherMemberIds);
         }
