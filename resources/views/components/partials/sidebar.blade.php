@@ -171,4 +171,16 @@
             </div>
         </div>
     </nav>
+
+    @if(auth()->check() && auth()->user()->is_super_admin)
+    <div class="border-t border-gray-100 p-3 bg-[#fdfdfd]">
+        <a href="#"
+           class="group flex items-center justify-center rounded-md text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 transition-colors h-10 w-full"
+           title="Panel de Administración"
+        >
+            <x-lucide-settings class="size-icon-xl text-gray-400 group-hover:text-gray-600" x-bind:class="collapsed ? '' : 'mr-2'" />
+            <span x-show="!collapsed" x-transition.opacity.duration.300ms class="text-menu font-medium whitespace-nowrap">Panel de Administración</span>
+        </a>
+    </div>
+    @endif
 </aside>
