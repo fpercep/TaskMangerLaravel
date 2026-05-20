@@ -10,20 +10,22 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Utiliza firstOrCreate para garantizar la idempotencia (no duplicará registros)
-        User::firstOrCreate(
+        // Utiliza updateOrCreate para garantizar que el usuario de prueba siempre tenga el rol correcto
+        User::updateOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
                 'password' => Hash::make('password'),
+                'is_super_admin' => true,
             ]
         );
 
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'other@example.com'],
             [
                 'name' => 'Other User',
                 'password' => Hash::make('password'),
+                'is_super_admin' => false,
             ]
         );
     }

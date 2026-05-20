@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/projects/{project}/members/{user}', [App\Http\Controllers\ProjectMemberController::class, 'destroy'])->name('projects.members.destroy');
     Route::post('/projects/{project}/members/sync', [App\Http\Controllers\ProjectMemberController::class, 'sync'])->name('projects.members.sync');
     Route::delete('/projects/{project}/members', [App\Http\Controllers\ProjectMemberController::class, 'destroyBulk'])->name('projects.members.destroy-bulk');
+    Route::post('/projects/{project}/leave', [App\Http\Controllers\ProjectMemberController::class, 'leave'])->name('projects.leave');
 
     // Rutas de Tareas
     Route::post('/projects/{project}/tasks', [TaskController::class, 'store'])->name('tasks.store');

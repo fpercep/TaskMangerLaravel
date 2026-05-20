@@ -143,6 +143,33 @@ class ProjectMemberService
         }
     }
 
+    /**
+     * Leave the project.
+     */
+    public function leaveProject(Project $project, int $userId): bool
+    {
+        $userRole = $this->getProjectRole($project, $userId);
+
+        // Si no es miembro, no hacer nada
+        if (!$userRole) {
+            return false;
+        }
+
+        // Si es admin y es el último admin, bloquear
+        if ($userRole === 'admin' && $this->isLastAdmin($project, $userId)) {
+            return false;
+        }
+
+        // Desasignar tareas del usuario en este proyecto
+        $project->tasks()->where('assigned_user_id', $userId)->update(['assigned_user_id' => null]);
+
+        // Detach del proyecto
+        $project->users()->detach($userId);
+        $this->triggerPostActionEvents($userId, $project, 'removed');
+
+        return true;
+    }
+
     // =========================================================================
     // MÉTODOS PRIVADOS DE SOPORTE
     // =========================================================================

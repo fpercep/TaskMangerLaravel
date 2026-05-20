@@ -101,5 +101,9 @@ mysql:
 ps:
 	$(COMPOSE) ps
 
+## Ejecutar pruebas (e.g. make test filter=LeaveProjectTest)
+test:
+	$(APP) php artisan test --filter="$(filter)"
+
 .PHONY: setup up up-logs down reset rebuild shell migrate seed cache-clear \
-        tinker composer-install composer-require npm-install logs logs-s mysql ps
+        tinker composer-install composer-require npm-install logs logs-s mysql ps test

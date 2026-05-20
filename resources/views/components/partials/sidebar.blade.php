@@ -156,6 +156,14 @@
                                     Eliminar
                                 </x-ui.dropdown-item>
                             @endif
+
+                            <x-ui.dropdown-item 
+                                icon="log-out" 
+                                :destructive="true" 
+                                @click.stop='openMenu = false; leaveProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }})'
+                            >
+                                Abandonar
+                            </x-ui.dropdown-item>
                         </x-ui.context-menu>
                     </div>
                     @endforeach

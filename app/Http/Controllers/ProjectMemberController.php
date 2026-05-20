@@ -98,6 +98,30 @@ class ProjectMemberController extends Controller
     }
 
     /**
+     * El usuario autenticado abandona el proyecto.
+     */
+    public function leave(Request $request, Project $project)
+    {
+        $this->authorize('leave', $project);
+
+        $left = $this->memberService->leaveProject($project, auth()->id());
+
+        if (!$left) {
+            $message = 'No puedes abandonar el proyecto porque eres el único administrador. Asigna otro admin antes de salir.';
+            
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $message], 422);
+            }
+            return back()->with('error', $message);
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => 'Has abandonado el proyecto.']);
+        }
+        return redirect()->route('dashboard')->with('success', 'Has abandonado el proyecto.');
+    }
+
+    /**
      * Centraliza la respuesta exitosa.
      */
     protected function respondSuccess($request, string $message)

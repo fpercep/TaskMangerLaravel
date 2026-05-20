@@ -89,5 +89,12 @@ export default () => ({
             name: 'delete-project',
             payload: { project: { id, name } }
         });
+    },
+
+    leaveProject(id, name) {
+        this.$dispatch('open-modal', {
+            name: 'leave-project',
+            payload: { project: { id, name } }
+        });
     }
 });

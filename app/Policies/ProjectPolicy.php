@@ -57,6 +57,14 @@ class ProjectPolicy
     }
 
     /**
+     * Determine whether the user can leave the project.
+     */
+    public function leave(User $user, Project $project): bool
+    {
+        return $user->projects()->where('project_id', $project->id)->exists();
+    }
+
+    /**
      * Comprueba si el usuario tiene uno de los roles especificados en el proyecto.
      */
     private function hasRole(User $user, Project $project, array $roles): bool
