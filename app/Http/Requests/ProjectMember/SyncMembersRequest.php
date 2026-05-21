@@ -17,7 +17,7 @@ class SyncMembersRequest extends FormRequest
             'users' => ['required', 'array'],
             // Validamos que cada elemento del array tenga la estructura correcta
             'users.*.user_id' => ['required', 'integer', 'exists:users,id'],
-            'users.*.role' => ['required', 'string', 'in:admin,editor,viewer'],
+            'users.*.role' => ['required', 'string', 'in:admin,manager,editor'],
         ];
     }
 }

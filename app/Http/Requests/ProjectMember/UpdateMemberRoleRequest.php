@@ -14,7 +14,7 @@ class UpdateMemberRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => ['required', 'string', 'in:admin,editor,viewer'],
+            'role' => ['required', 'string', 'in:admin,manager,editor'],
         ];
     }
 }

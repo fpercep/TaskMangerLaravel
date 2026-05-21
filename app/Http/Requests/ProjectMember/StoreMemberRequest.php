@@ -16,8 +16,7 @@ class StoreMemberRequest extends FormRequest
         return [
             // El usuario debe existir en la BD
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            // Ajusta estos roles según los que uses en tu sistema
-            'role' => ['required', 'string', 'in:admin,editor,viewer'],
+            'role' => ['required', 'string', 'in:admin,manager,editor'],
         ];
     }
 }

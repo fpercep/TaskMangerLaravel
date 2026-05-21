@@ -9,6 +9,7 @@ use App\Services\SidebarCacheService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use App\Events\Project\MemberUpdated;
 
 class ProjectMemberService
 {
@@ -49,6 +50,9 @@ class ProjectMemberService
 
         if ($affectedRows > 0) {
             SidebarCacheService::forget($userId);
+            
+            $memberIds = $project->users()->pluck('users.id')->toArray();
+            MemberUpdated::dispatch($userId, $project->id, $project->name, $role, $memberIds);
         }
     }
 
@@ -108,6 +112,14 @@ class ProjectMemberService
 
         foreach ($changes['attached'] as $attachedId) {
             MemberAddedToProject::dispatch($attachedId, $project->id, $project->name);
+        }
+
+        $memberIds = $project->users()->pluck('users.id')->toArray();
+        foreach ($changes['updated'] as $updatedId) {
+            $role = $syncData[$updatedId]['role'] ?? null;
+            if ($role) {
+                MemberUpdated::dispatch($updatedId, $project->id, $project->name, $role, $memberIds);
+            }
         }
     }
 

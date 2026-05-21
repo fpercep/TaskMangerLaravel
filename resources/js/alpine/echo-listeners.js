@@ -23,6 +23,12 @@ export default function echoListeners(userId) {
                 new CustomEvent('project-added', { detail: payload })
             );
         })
+        .listen('.MemberUpdated', (payload) => {
+            console.log('Evento recibido: MemberUpdated', payload);
+            window.dispatchEvent(
+                new CustomEvent('project-member-updated', { detail: payload })
+            );
+        })
         .listen('.ProjectDeleted', (payload) => {
             console.log('Evento recibido: ProjectDeleted', payload);
             window.dispatchEvent(

@@ -115,7 +115,10 @@
                     @php
                         $isProjectActive = $activeProjectId == $proyecto->id;
                     @endphp
-                    <div class="group relative flex items-center justify-between px-2 py-1.5 text-sidebar-item font-medium {{ $isProjectActive ? 'bg-orange-50/70 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800' }} rounded-md transition-colors" x-data="{ openMenu: false }">
+                    <div class="group relative flex items-center justify-between px-2 py-1.5 text-sidebar-item font-medium {{ $isProjectActive ? 'bg-orange-50/70 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800' }} rounded-md transition-colors" 
+                         x-data="{ openMenu: false, role: '{{ $proyecto->role ?? 'editor' }}' }"
+                         @project-member-updated.window="if ($event.detail.project_id === {{ $proyecto->id }} && $event.detail.user_id === window.AppUserId) { role = $event.detail.role; }"
+                    >
                         <!-- Enlace principal al Proyecto -->
                         <a href="{{ route('projects.show', $proyecto->id) }}" class="flex items-center truncate pl-2 flex-1 outline-none">
                             <span class="w-2 h-2 rounded-full {{ $proyecto->color ?? 'bg-orange-500' }} mr-2.5 shrink-0 {{ $isProjectActive ? '' : 'mix-blend-multiply' }}"></span>
@@ -127,35 +130,33 @@
                             <x-lucide-more-horizontal class="size-icon-xs" />
                         </button>
 
-                        <!-- Dropdown Contextual Reutilizable -->
                         <x-ui.context-menu>
-                            @if(($proyecto->role ?? 'editor') === 'admin' || ($proyecto->role ?? 'editor') === 'manager')
-                                <x-ui.dropdown-item 
-                                    icon="pencil" 
-                                    @click.stop='openMenu = false; editProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }}, {{ Js::from($proyecto->description) }})'
-                                >
-                                    Editar
-                                </x-ui.dropdown-item>
+                            <x-ui.dropdown-item 
+                                icon="pencil" 
+                                x-show="role === 'admin' || role === 'manager'"
+                                @click.stop='openMenu = false; editProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }}, {{ Js::from($proyecto->description) }})'
+                            >
+                                Editar
+                            </x-ui.dropdown-item>
 
-                                <x-ui.dropdown-item 
-                                    icon="user-round-cog" 
-                                    @click.stop="openMenu = false; $dispatch('open-modal', { name: 'manage-users', payload: { project: {{ Js::from($proyecto) }} } })"
-                                >
-                                    Usuarios
-                                </x-ui.dropdown-item>
-                            @endif
+                            <x-ui.dropdown-item 
+                                icon="user-round-cog" 
+                                x-show="role === 'admin' || role === 'manager'"
+                                @click.stop="openMenu = false; $dispatch('open-modal', { name: 'manage-users', payload: { project: {{ Js::from($proyecto) }} } })"
+                            >
+                                Usuarios
+                            </x-ui.dropdown-item>
 
-                            @if(($proyecto->role ?? 'editor') === 'admin')
-                                <div class="h-px bg-gray-100 my-1"></div>
+                            <div class="h-px bg-gray-100 my-1" x-show="role === 'admin'"></div>
 
-                                <x-ui.dropdown-item 
-                                    icon="trash-2" 
-                                    :destructive="true" 
-                                    @click.stop='openMenu = false; deleteProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }})'
-                                >
-                                    Eliminar
-                                </x-ui.dropdown-item>
-                            @endif
+                            <x-ui.dropdown-item 
+                                icon="trash-2" 
+                                :destructive="true" 
+                                x-show="role === 'admin'"
+                                @click.stop='openMenu = false; deleteProject({{ $proyecto->id }}, {{ Js::from($proyecto->name) }})'
+                            >
+                                Eliminar
+                            </x-ui.dropdown-item>
 
                             <x-ui.dropdown-item 
                                 icon="log-out" 
