@@ -50,7 +50,7 @@ class TaskController extends Controller
         ]);
 
         return DB::transaction(function () use ($task) {
-            $newTask = $task->replicate();
+            $newTask = $task->replicate(['steps_count', 'completed_steps_count']);
             $newTask->assigned_user_id = null;
             $newTask->save();
 

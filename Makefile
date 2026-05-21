@@ -103,7 +103,11 @@ ps:
 
 ## Ejecutar pruebas (e.g. make test filter=LeaveProjectTest)
 test:
+ifdef filter
 	$(APP) php artisan test --filter="$(filter)"
+else
+	$(APP) php artisan test
+endif
 
 .PHONY: setup up up-logs down reset rebuild shell migrate seed cache-clear \
         tinker composer-install composer-require npm-install logs logs-s mysql ps test
