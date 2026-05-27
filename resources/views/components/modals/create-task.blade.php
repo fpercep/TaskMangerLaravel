@@ -46,7 +46,7 @@
             </div>
 
             <!-- Botonera -->
-            <div class="flex items-center justify-end px-6 py-4 bg-gray-50/50 border-t border-gray-100 gap-3">
+            <div class="flex flex-col-reverse sm:flex-row items-center justify-end px-6 py-4 bg-gray-50/50 border-t border-gray-100 gap-3">
                 <button type="button" @click="show = false" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg transition-colors">
                     Cancelar
                 </button>

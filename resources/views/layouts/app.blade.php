@@ -25,7 +25,7 @@
 
         <x-partials.sidebar />
 
-        <main class="flex-1 overflow-y-auto bg-white p-8 relative">
+        <main class="flex-1 overflow-y-auto bg-white p-4 sm:p-6 md:p-8 relative">
             <div class="max-w-full mx-auto">
                 {{ $slot }}
             </div>

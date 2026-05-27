@@ -1,8 +1,8 @@
 <x-app-layout :title="'Proyecto - ' . $project->name">
     <div class="max-w-full mx-auto h-full flex flex-col">
         {{-- Header del Proyecto --}}
-        <div class="mb-10 flex flex-col items-start">
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight leading-none mb-3">{{ $project->name }}</h1>
+        <div class="mb-6 md:mb-10 flex flex-col items-start">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-none mb-2 md:mb-3">{{ $project->name }}</h1>
             
             <div class="ml-0.5">
                 @if($project->description)
@@ -32,7 +32,7 @@
              @task-steps-updated.window="store.upsertTask($event.detail.task)"
              @task-deleted.window="if($event.detail.project_id === store.projectId) store.removeTask($event.detail.task_id)">
 
-            <div class="min-w-max md:min-w-0 md:w-full flex-1 grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-3 py-2">
+            <div class="w-full flex-1 grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-3 py-2">
                 <x-kanban.column
                     status="pending"
                     label="Pendientes"

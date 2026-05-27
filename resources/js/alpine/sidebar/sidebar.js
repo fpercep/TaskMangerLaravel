@@ -4,9 +4,21 @@
  */
 export default () => ({
     collapsed: Alpine.$persist(false).as('sidebar_collapsed'),
+    mobileOpen: false,
 
     toggleSidebar() {
         this.collapsed = !this.collapsed;
+    },
+
+    toggleMobile() {
+        this.mobileOpen = !this.mobileOpen;
+        // Prevent body scroll when sidebar is open on mobile
+        document.body.classList.toggle('overflow-hidden', this.mobileOpen);
+    },
+
+    closeMobile() {
+        this.mobileOpen = false;
+        document.body.classList.remove('overflow-hidden');
     },
 
     // ═══════════════════════════════════════════

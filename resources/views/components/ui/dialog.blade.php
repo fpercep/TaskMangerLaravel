@@ -23,7 +23,7 @@ $alignmentClass = $centered ? 'text-center' : '';
     <template x-teleport="body">
         <div x-show="show" 
              style="display: none;"
-             class="fixed inset-0 z-confirmation flex items-center justify-center p-4 sm:p-0">
+             class="fixed inset-0 z-confirmation flex items-center justify-center p-4">
 
             <!-- Fondo desenfocado (Backdrop unificado) -->
             <div x-show="show" 

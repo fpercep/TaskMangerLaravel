@@ -13,7 +13,7 @@
          @user-selected.stop="handleUserSelected($event.detail.userId)">
         
         <!-- Sub-header de Miembros -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div class="flex flex-col">
                 <h2 class="text-xl font-bold text-gray-900 tracking-tighter">
                     Miembros del proyecto
@@ -40,7 +40,7 @@
                      x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                      x-transition:leave-end="opacity-0 scale-95 translate-y-[-10px]"
                      @click.away="showPanel = false"
-                     class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-gray-100 z-50 overflow-hidden"
+                     class="absolute right-0 sm:right-0 left-0 sm:left-auto mt-3 w-full sm:w-80 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-gray-100 z-50 overflow-hidden"
                      style="display: none;">
                     
                     <div class="p-4 border-b border-gray-50 bg-gray-50/30">
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Tabla de Miembros (Diseño Abierto) -->
-        <div class="flex-1 overflow-auto -mx-2 px-2 scrollbar-hide flex flex-col">
+        <div class="flex-1 overflow-auto -mx-2 px-2 scrollbar-hide scrollbar-mobile-hide flex flex-col">
             <div x-show="isBusy" class="py-12 flex justify-center">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>

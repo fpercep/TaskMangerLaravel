@@ -5,6 +5,13 @@
     <!-- LEFT SECTION -->
     <div class="flex items-center h-full min-w-0 flex-1">
         
+        <!-- MOBILE: Hamburger menu button -->
+        <button x-data @click="$dispatch('toggle-mobile-sidebar')" 
+                class="md:hidden flex items-center justify-center w-10 h-10 ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none"
+                title="Abrir menú">
+            <x-lucide-menu class="w-5 h-5" />
+        </button>
+        
         <!-- ESTADO EXPANDIDO: Mismo ancho que el sidebar (256px) SIN LA LÍNEA DEL BORDE (border-r) -->
         <!-- CONTROLES DE NAVEGACIÓN: Alineados con el sidebar (256px) para una estética de rejilla perfecta -->
         <div class="hidden md:flex items-center px-6 transition-all duration-300 h-full shrink-0 w-sidebar min-w-sidebar">

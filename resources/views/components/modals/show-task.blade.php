@@ -54,7 +54,7 @@
                     <x-ui.modal-header :project-name="$project->name" />
 
                     {{-- Cuerpo del modal --}}
-                    <div class="p-8 md:p-12 min-h-modal-body flex flex-col">
+                    <div class="p-4 sm:p-6 md:p-12 min-h-modal-body flex flex-col">
                         <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-16">
 
                             {{-- Columna Izquierda (Principal) --}}
@@ -77,7 +77,7 @@
                                 </div>
 
                                 {{-- Metadatos inline --}}
-                                <div class="flex items-center gap-4 text-sm text-gray-400">
+                                <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-400">
                                     {{-- Fecha de creación --}}
                                     <div class="flex items-center gap-1.5 hover:text-gray-600 transition-colors duration-200 cursor-default" title="Fecha de creación">
                                         <x-lucide-calendar class="w-4 h-4" />

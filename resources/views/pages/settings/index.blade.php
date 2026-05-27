@@ -3,9 +3,9 @@
         <h1 class="text-2xl font-bold text-gray-900 mb-6">Ajustes del Sistema</h1>
 
         <div class="flex flex-col md:flex-row gap-8">
-            <!-- Sidebar / Pestañas Vertiacales -->
+            <!-- Sidebar / Pestañas -->
             <aside class="w-full md:w-64 shrink-0">
-                <nav class="flex flex-col space-y-1">
+                <nav class="flex flex-row md:flex-col gap-1 overflow-x-auto pb-2 md:pb-0 border-b md:border-b-0 border-gray-100 scrollbar-mobile-hide">
                     <x-ui.tab-button name="profile" icon="user">
                         Mi Perfil
                     </x-ui.tab-button>

@@ -1,6 +1,6 @@
 <div class="space-y-6">
     <!-- Componente de Identidad / Avatar -->
-    <div class="bg-white p-6 md:p-8 shadow-sm rounded-xl border border-gray-100 flex items-center gap-6">
+    <div class="bg-white p-6 md:p-8 shadow-sm rounded-xl border border-gray-100 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
         <div class="w-20 h-20 rounded-full bg-gray-100 border border-gray-200 shrink-0 flex items-center justify-center overflow-hidden">
              <span class="text-2xl font-bold text-gray-500 uppercase">{{ $userData['initials'] }}</span>
         </div>
