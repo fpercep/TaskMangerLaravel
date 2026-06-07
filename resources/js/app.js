@@ -26,6 +26,7 @@ import contextMenu from './alpine/ui/context-menu';
 import prioritySlider from './alpine/tasks/priority-slider';
 import settingsTabs from './alpine/settings/tabs';
 import layoutPanel from './alpine/layout/panel';
+import myDay from './alpine/layout/my-day';
 
 Alpine.store('members', membersStore());
 Alpine.store('kanban', kanbanStore());
@@ -39,6 +40,7 @@ Alpine.data('contextMenu', contextMenu);
 Alpine.data('prioritySlider', prioritySlider);
 Alpine.data('settingsTabs', settingsTabs);
 Alpine.data('layoutPanel', layoutPanel);
+Alpine.data('myDay', myDay);
 
 Alpine.data('kanbanBoard', kanbanBoard);
 Alpine.data('taskDetailModal', taskDetailModal);
