@@ -23,6 +23,17 @@ class DashboardController extends Controller
             }
         );
 
+        $activeTasksCount = $taskCounts->get('pending', 0) + $taskCounts->get('in_progress', 0);
+        $completedTasksCount = $taskCounts->get('completed', 0);
+
+        // Limitamos a 50 tareas recientes para no sobrecargar la vista del dashboard
+        $assignedTasks = $user->tasks()
+            ->with('project')
+            ->whereNotIn('status', ['completed', 'cancelled']) // Priorizamos las no completadas
+            ->orderByRaw('due_date IS NULL, due_date ASC') // Las que tienen fecha antes
+            ->limit(50)
+            ->get();
+
         // I-F4: Clases completas pre-resueltas en vez de interpolación dinámica.
         // Tailwind necesita clases completas para detección en compilación/purge.
         $estadisticas = [
@@ -49,6 +60,6 @@ class DashboardController extends Controller
             ],
         ];
 
-        return view('pages.dashboard', compact('estadisticas'));
+        return view('pages.dashboard', compact('estadisticas', 'activeTasksCount', 'completedTasksCount', 'assignedTasks'));
     }
 }
