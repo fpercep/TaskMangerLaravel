@@ -37,7 +37,7 @@ test('overdue tasks appear in tareasAnteriores', function () {
     $response->assertOk();
     $tareasAnteriores = $response->viewData('tareasAnteriores');
     expect($tareasAnteriores)->toHaveCount(1);
-    expect($tareasAnteriores[0]['titulo'])->toBe('Tarea vencida');
+    expect($tareasAnteriores[0]['name'])->toBe('Tarea vencida');
 });
 
 test('future tasks appear in tareasMasTarde', function () {
@@ -58,7 +58,7 @@ test('future tasks appear in tareasMasTarde', function () {
     $response->assertOk();
     $tareasMasTarde = $response->viewData('tareasMasTarde');
     expect($tareasMasTarde)->toHaveCount(1);
-    expect($tareasMasTarde[0]['titulo'])->toBe('Tarea futura');
+    expect($tareasMasTarde[0]['name'])->toBe('Tarea futura');
 });
 
 test('completed tasks do not appear in my day', function () {
@@ -98,5 +98,5 @@ test('tasks without due date appear in tareasMasTarde', function () {
 
     $tareasMasTarde = $response->viewData('tareasMasTarde');
     expect($tareasMasTarde)->toHaveCount(1);
-    expect($tareasMasTarde[0]['fecha'])->toBe('Sin fecha');
+    expect($tareasMasTarde[0]['due_date_fmt'])->toBe('Sin fecha');
 });
