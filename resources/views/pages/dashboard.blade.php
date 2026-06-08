@@ -20,7 +20,13 @@
 
 
         <!-- Tareas Asignadas -->
-        <div class="mb-8" x-data="dashboardTasks(@js($assignedTasks))">
+        <div class="mb-8"
+             x-data="dashboardTasks(@js($assignedTasks))"
+             @task-created.window="handleRealtimeUpdate($event.detail.task)"
+             @task-updated.window="handleRealtimeUpdate($event.detail.task)"
+             @task-assigned.window="handleRealtimeUpdate($event.detail.task)"
+             @task-steps-updated.window="handleRealtimeUpdate($event.detail.task)"
+             @task-deleted.window="handleRealtimeDelete($event.detail.task_id)">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <h2 class="text-xl font-bold text-gray-900">Mis Tareas</h2>
                 
@@ -40,12 +46,12 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-x-auto -mx-2 px-2 scrollbar-hide max-h-[500px]">
+            <div class="flex-1 overflow-x-auto -mx-2 px-2 scrollbar-hide max-h-[32rem]">
                 <table class="w-full text-left border-collapse">
                     <thead class="sticky top-0 bg-white z-10">
                         <tr class="border-b border-gray-50">
                             <!-- Accesibilidad: text-gray-600 en lugar de 400 -->
-                            <th class="py-4 px-2 text-sm font-semibold text-gray-600">Tarea</th>
+                                <th class="py-4 px-2 text-sm font-semibold text-gray-600">Nombre</th>
                             <th class="py-4 px-2 text-sm font-semibold text-gray-600 w-32">Estado</th>
                             <th class="py-4 px-2 text-sm font-semibold text-gray-600 w-32">Prioridad</th>
                             <th class="py-4 px-2 text-sm font-semibold text-gray-600 w-32">Vencimiento</th>
@@ -53,7 +59,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <template x-for="task in filteredTasks" :key="task.id">
-                            <tr class="group hover:bg-gray-50/30 transition-colors">
+                            <tr @click="goToTask(task)" class="group hover:bg-gray-50/30 transition-colors cursor-pointer">
                                 <td class="py-4 px-2">
                                     <div class="flex flex-col">
                                         <span class="text-sm font-semibold text-gray-900" x-text="task.name"></span>
@@ -107,64 +113,7 @@
             </div>
         </div>
 
-        <script>
-            document.addEventListener('alpine:init', () => {
-                Alpine.data('dashboardTasks', (initialTasks) => ({
-                    tasks: initialTasks,
-                    search: '',
-                    filter: 'all',
-                    
-                    get filteredTasks() {
-                        return this.tasks.filter(task => {
-                            const term = this.search.toLowerCase();
-                            const matchesSearch = task.name.toLowerCase().includes(term) || 
-                                                  (task.project && task.project.name.toLowerCase().includes(term));
-                            
-                            const matchesFilter = this.filter === 'all' || task.status === this.filter;
-                            
-                            return matchesSearch && matchesFilter;
-                        });
-                    },
-                    
-                    statusLabel(status) {
-                        const labels = {
-                            'pending': 'Pendiente',
-                            'in_progress': 'En Progreso',
-                            'completed': 'Completada',
-                            'cancelled': 'Cancelada'
-                        };
-                        return labels[status] || status;
-                    },
-                    
-                    priorityLabel(priority) {
-                        const labels = {
-                            'urgent': 'Urgente',
-                            'high': 'Alta',
-                            'medium': 'Media',
-                            'low': 'Baja'
-                        };
-                        return labels[priority] || priority;
-                    },
 
-                    formatDate(dateString) {
-                        const date = new Date(dateString);
-                        return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-                    },
-
-                    isOverdue(task) {
-                        if (!task.due_date || task.status === 'completed' || task.status === 'cancelled') return false;
-                        
-                        const dueDate = new Date(task.due_date);
-                        dueDate.setHours(0,0,0,0);
-                        
-                        const today = new Date();
-                        today.setHours(0,0,0,0);
-                        
-                        return dueDate < today;
-                    }
-                }));
-            });
-        </script>
         </div>
     </div>
 </x-app-layout>

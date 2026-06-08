@@ -24,7 +24,7 @@
                     'duplicate' => route('tasks.duplicate', ['task' => ':id']),
                     'delete' => route('tasks.destroy', ['task' => ':id'])
                  ]) }}
-             ); Alpine.store('members').fetch({{ $project->id }})"
+             ); Alpine.store('members').fetch({{ $project->id }}); checkUrlForTask()"
              @confirm-delete-task.window="deleteTask($event.detail)"
              @task-created.window="store.upsertTask($event.detail.task)"
              @task-updated.window="store.upsertTask($event.detail.task)"

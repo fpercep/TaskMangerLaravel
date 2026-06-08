@@ -14,7 +14,7 @@ class TaskBroadcastResource extends JsonResource
      */
     public function toArray(Request $request = null): array
     {
-        $this->loadMissing(['steps', 'assignedUser']);
+        $this->loadMissing(['steps', 'assignedUser', 'project']);
         
         $this->loadCount([
             'steps',
@@ -24,6 +24,10 @@ class TaskBroadcastResource extends JsonResource
         return [
             'id' => $this->id,
             'project_id' => $this->project_id,
+            'project' => $this->project ? [
+                'id' => $this->project->id,
+                'name' => $this->project->name,
+            ] : null,
             'assigned_user_id' => $this->assigned_user_id,
             'assigned_user' => $this->assignedUser ? [
                 'id' => $this->assignedUser->id,

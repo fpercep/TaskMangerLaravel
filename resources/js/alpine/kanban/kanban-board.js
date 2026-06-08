@@ -130,4 +130,21 @@ export default () => ({
             type: result ? 'success' : 'error',
         });
     },
+
+    checkUrlForTask() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskIdStr = urlParams.get('task');
+        if (taskIdStr) {
+            const taskId = parseInt(taskIdStr, 10);
+            const task = this.store.taskById(taskId);
+            if (task) {
+                this.$nextTick(() => {
+                    this.$dispatch('open-task-details', task);
+                });
+                const url = new URL(window.location);
+                url.searchParams.delete('task');
+                window.history.replaceState({}, '', url);
+            }
+        }
+    },
 });

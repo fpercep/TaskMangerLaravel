@@ -154,7 +154,7 @@ export default (config) => ({
         this.processingIds.add(tarea.id);
 
         const prevStatus = tarea.status;
-        const newStatus = tarea.status === 'completed' ? 'pending' : 'completed';
+        const newStatus = tarea.status === 'completed' ? 'in_progress' : 'completed';
 
         // Optimistic update
         tarea.status = newStatus;
@@ -174,6 +174,62 @@ export default (config) => ({
      */
     setFiltroProyecto(projectId) {
         this.filtroProyecto = projectId;
+    },
+
+    handleRealtimeUpdate(updatedTask) {
+        const isAssignedToMe = updatedTask.assigned_user_id === window.AppUserId;
+
+        // Eliminarla de todos los arrays primero
+        this._removeFromArray(this.tareasHoy, updatedTask.id);
+        this._removeFromArray(this.tareasMasTarde, updatedTask.id);
+        this._removeFromArray(this.tareasAnteriores, updatedTask.id);
+
+        if (!isAssignedToMe) {
+            return;
+        }
+
+        let formattedDate = 'Sin fecha';
+        if (updatedTask.due_date) {
+            const parts = updatedTask.due_date.split('-');
+            if (parts.length === 3) {
+                formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+        }
+
+        const mappedTask = {
+            id: updatedTask.id,
+            name: updatedTask.name,
+            status: updatedTask.status,
+            priority: updatedTask.priority,
+            due_date: updatedTask.due_date,
+            due_date_fmt: formattedDate,
+            project_id: updatedTask.project_id,
+            project_name: updatedTask.project ? updatedTask.project.name : 'Sin Proyecto',
+        };
+
+        if (updatedTask.due_date) {
+            if (updatedTask.due_date === this.fechaHoy) {
+                this.tareasHoy.push(mappedTask);
+            } else if (updatedTask.due_date < this.fechaHoy) {
+                if (updatedTask.status !== 'completed' && updatedTask.status !== 'cancelled') {
+                    this.tareasAnteriores.push(mappedTask);
+                }
+            } else {
+                if (updatedTask.status !== 'completed' && updatedTask.status !== 'cancelled') {
+                    this.tareasMasTarde.push(mappedTask);
+                }
+            }
+        } else {
+            if (updatedTask.status !== 'completed' && updatedTask.status !== 'cancelled') {
+                this.tareasMasTarde.push(mappedTask);
+            }
+        }
+    },
+
+    handleRealtimeDelete(taskId) {
+        this._removeFromArray(this.tareasHoy, taskId);
+        this._removeFromArray(this.tareasMasTarde, taskId);
+        this._removeFromArray(this.tareasAnteriores, taskId);
     },
 
     // --- Helpers internos ---

@@ -46,7 +46,7 @@
                     <div class="w-10 h-10 flex items-center justify-center shrink-0">
                         <x-lucide-list-todo class="size-icon-xl {{ $currentRoute === 'mi-dia' ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600' }}" />
                     </div>
-                    <span class="text-menu font-medium ml-1">Lista de Tareas</span>
+                    <span class="text-menu font-medium ml-1">Mi día</span>
                 </a>
 
                 <a href="#" class="group flex items-center px-2 py-0 rounded-md text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 transition-colors">
@@ -151,7 +151,7 @@
                     <div class="w-10 h-10 flex items-center justify-center shrink-0">
                         <x-lucide-list-todo class="size-icon-xl {{ $currentRoute === 'mi-dia' ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600' }}" />
                     </div>
-                    <span x-show="!collapsed" x-transition.opacity.duration.300ms class="text-menu font-medium ml-1">Lista de Tareas</span>
+                    <span x-show="!collapsed" x-transition.opacity.duration.300ms class="text-menu font-medium ml-1">Mi día</span>
                 </a>
 
                 {{-- Calendario --}}

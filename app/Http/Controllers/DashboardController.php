@@ -32,7 +32,20 @@ class DashboardController extends Controller
             ->whereNotIn('status', ['completed', 'cancelled']) // Priorizamos las no completadas
             ->orderByRaw('due_date IS NULL, due_date ASC') // Las que tienen fecha antes
             ->limit(50)
-            ->get();
+            ->get()
+            ->map(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'name' => $task->name,
+                    'status' => $task->status,
+                    'priority' => $task->priority,
+                    'due_date' => $task->due_date?->format('Y-m-d'),
+                    'project' => $task->project ? [
+                        'id' => $task->project->id,
+                        'name' => $task->project->name,
+                    ] : null,
+                ];
+            });
 
         // I-F4: Clases completas pre-resueltas en vez de interpolación dinámica.
         // Tailwind necesita clases completas para detección en compilación/purge.
