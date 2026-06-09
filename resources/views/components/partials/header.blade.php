@@ -41,6 +41,7 @@
                 'mi-dia' => 'Mi Día',
                 'projects.show' => 'Proyectos',
                 'settings.index' => 'Ajustes',
+                'admin.index' => 'Administración',
                 default => 'Dashboard'
             };
             $originalTitle = $title ?? $autoTitle;

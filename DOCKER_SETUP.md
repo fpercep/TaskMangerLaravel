@@ -96,12 +96,12 @@ TaskMangerLaravel/
 ### Cambios en `.env`
 
 ```dotenv
-DB_HOST=mysql                        # Antes: 127.0.0.1
-DB_PASSWORD=root                     # Antes: vacío
-REDIS_HOST=redis                     # Antes: 127.0.0.1
-APP_URL=http://localhost:8000        # Antes: http://localhost
+DB_HOST=mysql                        
+DB_PASSWORD=root                     
+REDIS_HOST=redis                     
+APP_URL=http://localhost:8000        
 REVERB_HOST=localhost
-REVERB_HOST_INTERNAL=reverb          # El backend conecta al contenedor directamente
+REVERB_HOST_INTERNAL=reverb         
 ```
 
 ---

@@ -9,8 +9,13 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskStepController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 
 Route::middleware('auth')->group(function () {
+    Route::middleware('super_admin')->group(function () {
+        Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    });
+
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/mi-dia', [MyDayController::class, 'index'])->name('mi-dia');

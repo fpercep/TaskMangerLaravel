@@ -28,6 +28,7 @@ import settingsTabs from './alpine/settings/tabs';
 import layoutPanel from './alpine/layout/panel';
 import myDay from './alpine/layout/my-day';
 import dashboardTasks from './alpine/layout/dashboard-tasks';
+import adminPanel from './alpine/admin/admin-panel';
 
 Alpine.store('members', membersStore());
 Alpine.store('kanban', kanbanStore());
@@ -43,6 +44,7 @@ Alpine.data('settingsTabs', settingsTabs);
 Alpine.data('layoutPanel', layoutPanel);
 Alpine.data('myDay', myDay);
 Alpine.data('dashboardTasks', dashboardTasks);
+Alpine.data('adminPanel', adminPanel);
 
 Alpine.data('kanbanBoard', kanbanBoard);
 Alpine.data('taskDetailModal', taskDetailModal);
