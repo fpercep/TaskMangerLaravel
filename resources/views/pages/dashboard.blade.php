@@ -73,7 +73,7 @@
                                               'bg-green-100 text-green-700': task.status === 'completed',
                                               'bg-blue-100 text-blue-700': task.status === 'in_progress',
                                               'bg-gray-100 text-gray-700': task.status === 'cancelled',
-                                              'bg-orange-50 text-orange-500 border border-orange-100': task.status === 'pending'
+                                              'bg-gray-100 text-gray-700': task.status === 'pending'
                                           }"
                                           x-text="statusLabel(task.status)">
                                     </span>
@@ -81,9 +81,9 @@
                                 <td class="py-4 px-2">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize"
                                           :class="{
-                                              'bg-purple-100 text-purple-700': task.priority === 'urgent',
-                                              'bg-red-100 text-red-700': task.priority === 'high',
-                                              'bg-orange-100 text-orange-700': task.priority === 'medium',
+                                              'bg-red-100 text-red-700': task.priority === 'urgent',
+                                              'bg-orange-100 text-orange-700': task.priority === 'high',
+                                              'bg-yellow-100 text-yellow-800': task.priority === 'medium',
                                               'bg-blue-100 text-blue-700': task.priority === 'low'
                                           }"
                                           x-text="priorityLabel(task.priority)">
@@ -92,7 +92,7 @@
                                 <td class="py-4 px-2">
                                     <!-- Corrección de Lógica de Fecha: Solo rojo si es pasada estrictamente -->
                                     <template x-if="task.due_date">
-                                        <span class="text-sm" :class="isOverdue(task) ? 'text-red-500 font-semibold' : 'text-gray-600'" x-text="formatDate(task.due_date)"></span>
+                                        <span class="text-sm" :class="isOverdue(task) ? 'text-red-500' : 'text-gray-600'" x-text="formatDate(task.due_date)"></span>
                                     </template>
                                     <template x-if="!task.due_date">
                                         <span class="text-sm text-gray-400">-</span>

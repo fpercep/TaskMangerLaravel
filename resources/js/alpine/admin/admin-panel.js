@@ -1,9 +1,10 @@
-export default (users, projects) => ({
+export default (users, projects, currentUserId) => ({
     tab: 'users',
     search: '',
     isSearchOpen: false,
     users: users,
     projects: projects,
+    currentUserId: currentUserId,
 
     get filteredUsers() {
         if (!this.search) return this.users;

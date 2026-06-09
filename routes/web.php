@@ -14,6 +14,9 @@ use App\Http\Controllers\AdminController;
 Route::middleware('auth')->group(function () {
     Route::middleware('super_admin')->group(function () {
         Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+        Route::post('/admin/users', [AdminController::class, 'storeUser'])->name('admin.users.store');
+        Route::put('/admin/users/{user}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+        Route::delete('/admin/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
     });
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

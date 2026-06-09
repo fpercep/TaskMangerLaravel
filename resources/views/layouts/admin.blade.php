@@ -31,6 +31,8 @@
 
     <!-- Modales Globales Esenciales -->
     <x-modals.manage-users />
+    <x-modals.save-user />
+    <x-modals.delete-user-confirmation />
 
     @stack('scripts')
 </body>

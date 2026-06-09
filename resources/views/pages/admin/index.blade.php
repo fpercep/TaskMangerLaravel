@@ -6,22 +6,64 @@
         </div>
     </div>
 
-    <div x-data="adminPanel(@js($users), @js($projects))" class="flex flex-col gap-2">
+    {{-- Flash messages --}}
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition
+             class="mb-4 flex items-center gap-2 text-sm text-green-700 bg-green-50 px-4 py-3 rounded-lg border border-green-100">
+            <x-lucide-check-circle-2 class="w-4 h-4 shrink-0" />
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition
+             class="mb-4 flex items-center gap-2 text-sm text-red-700 bg-red-50 px-4 py-3 rounded-lg border border-red-100">
+            <x-lucide-alert-circle class="w-4 h-4 shrink-0" />
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div x-data="{ show: true }" x-show="show" x-transition
+             class="mb-4 text-sm text-red-700 bg-red-50 px-4 py-3 rounded-lg border border-red-100">
+            <div class="flex items-center gap-2 mb-1">
+                <x-lucide-alert-circle class="w-4 h-4 shrink-0" />
+                <span class="font-medium">Se encontraron errores:</span>
+            </div>
+            <ul class="list-disc list-inside ml-6 space-y-0.5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div x-data="adminPanel(@js($users), @js($projects), {{ auth()->id() }})" class="flex flex-col gap-2">
         
         <!-- Pestañas -->
-        <div class="flex items-center gap-4 w-full mb-2">
-            <button @click="switchTab('users')" 
-                    :class="tab === 'users' ? 'text-black font-bold' : 'text-gray-500 hover:text-black font-semibold'" 
-                    class="text-[15px] transition-all flex items-center gap-2 tracking-tight py-1.5">
-                Usuarios
-            </button>
-            
-            <div class="w-px h-4 bg-gray-300"></div>
+        <div class="flex items-center justify-between w-full mb-2">
+            <div class="flex items-center gap-4">
+                <button @click="switchTab('users')" 
+                        :class="tab === 'users' ? 'text-black font-bold' : 'text-gray-500 hover:text-black font-semibold'" 
+                        class="text-[15px] transition-all flex items-center gap-2 tracking-tight py-1.5">
+                    Usuarios
+                </button>
+                
+                <div class="w-px h-4 bg-gray-300"></div>
 
-            <button @click="switchTab('projects')" 
-                    :class="tab === 'projects' ? 'text-black font-bold' : 'text-gray-500 hover:text-black font-semibold'" 
-                    class="text-[15px] transition-all flex items-center gap-2 tracking-tight py-1.5">
-                Proyectos
+                <button @click="switchTab('projects')" 
+                        :class="tab === 'projects' ? 'text-black font-bold' : 'text-gray-500 hover:text-black font-semibold'" 
+                        class="text-[15px] transition-all flex items-center gap-2 tracking-tight py-1.5">
+                    Proyectos
+                </button>
+            </div>
+
+            <!-- Botón nuevo usuario (visible solo en pestaña usuarios) -->
+            <button x-show="tab === 'users'"
+                    @click="$dispatch('open-modal', { name: 'save-user', payload: { user: null, currentUserId: currentUserId } })"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+                <x-lucide-plus class="w-4 h-4" />
+                Nuevo usuario
             </button>
         </div>
 
@@ -38,12 +80,15 @@
                                 <th class="py-2 px-4 text-sm font-medium text-gray-400 tracking-normal">Tareas Asignadas</th>
                                 <th class="py-2 px-4 text-sm font-medium text-gray-400 tracking-normal">Tareas Pendientes</th>
                                 <th class="py-2 px-4 text-sm font-medium text-gray-400 tracking-normal">Tareas Realizadas</th>
-                                <th class="py-2 px-4 text-sm font-medium text-gray-400 tracking-normal text-right">Fecha de Registro</th>
+                                <th class="py-2 px-4 text-sm font-medium text-gray-400 tracking-normal">Fecha de Registro</th>
+                                <th class="py-2 px-4 text-sm font-medium text-gray-400 tracking-normal text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
                             <template x-for="user in filteredUsers" :key="user.id">
-                                <tr class="hover:bg-gray-50/50 transition-colors group">
+                                <tr class="hover:bg-gray-50/50 transition-colors group"
+                                    :class="user.id !== currentUserId ? 'cursor-pointer' : ''"
+                                    @click="user.id !== currentUserId && $dispatch('open-modal', { name: 'save-user', payload: { user: { ...user }, currentUserId: currentUserId } })">
                                     <td class="py-2 px-4">
                                         <div class="flex items-center gap-4">
                                             <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-500 shrink-0">
@@ -53,6 +98,7 @@
                                                 <span class="text-[15px] font-semibold text-gray-900 truncate leading-snug" x-text="user.name"></span>
                                                 <span class="text-[13px] text-gray-500 truncate" x-text="user.email"></span>
                                             </div>
+                                            <span x-show="user.id === currentUserId" class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full shrink-0">Tú</span>
                                         </div>
                                     </td>
                                     <td class="py-2 px-4">
@@ -75,14 +121,28 @@
                                     <td class="py-2 px-4">
                                         <span class="text-sm text-gray-600" x-text="user.completed_tasks_count"></span>
                                     </td>
-                                    <td class="py-2 px-4 text-right">
+                                    <td class="py-2 px-4">
                                         <span class="text-sm text-gray-500" x-text="formatDate(user.created_at)"></span>
+                                    </td>
+                                    <td class="py-2 px-4 text-right">
+                                        <div x-show="user.id !== currentUserId" class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button @click.stop="$dispatch('open-modal', { name: 'save-user', payload: { user: { ...user }, currentUserId: currentUserId } })"
+                                                    class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors focus:outline-none"
+                                                    title="Editar usuario">
+                                                <x-lucide-pencil class="w-4 h-4" />
+                                            </button>
+                                            <button @click.stop="$dispatch('open-modal', { name: 'delete-user', payload: { user: { ...user } } })"
+                                                    class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors focus:outline-none"
+                                                    title="Eliminar usuario">
+                                                <x-lucide-trash-2 class="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </template>
                             <template x-if="filteredUsers.length === 0">
                                 <tr>
-                                    <td colspan="7" class="py-12 text-center">
+                                    <td colspan="8" class="py-12 text-center">
                                         <div class="flex flex-col items-center justify-center text-gray-400">
                                             <x-lucide-search-x class="w-12 h-12 mb-3 text-gray-300" />
                                             <p class="text-sm font-medium text-gray-600">No se encontraron usuarios</p>
@@ -171,4 +231,5 @@
         </div>
 
     </div>
+
 </x-admin-layout>

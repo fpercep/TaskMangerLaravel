@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -77,5 +79,78 @@ class AdminController extends Controller
             'users' => $users,
             'projects' => $projects,
         ]);
+    }
+
+    /**
+     * Crea un nuevo usuario desde el panel de administración.
+     */
+    public function storeUser(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', Password::min(8)],
+            'is_super_admin' => ['sometimes', 'boolean'],
+        ]);
+
+        // Asignación manual: is_super_admin no está en $fillable del modelo
+        // por seguridad, así que se asigna explícitamente.
+        $user = new User();
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = $validated['password'];
+        $user->is_super_admin = filter_var($validated['is_super_admin'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $user->save();
+
+        return redirect()->route('admin.index')
+            ->with('success', 'Usuario creado correctamente.');
+    }
+
+    /**
+     * Actualiza un usuario existente desde el panel de administración.
+     * No permite que el admin se cambie el rol a sí mismo.
+     */
+    public function updateUser(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'password' => ['nullable', Password::min(8)],
+            'is_super_admin' => ['sometimes', 'boolean'],
+        ]);
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+
+        // Protección: no permitir que el admin modifique su propio rol
+        if ($user->id !== auth()->id()) {
+            $user->is_super_admin = filter_var($validated['is_super_admin'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if (!empty($validated['password'])) {
+            $user->password = $validated['password'];
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.index')
+            ->with('success', 'Usuario actualizado correctamente.');
+    }
+
+    /**
+     * Elimina un usuario desde el panel de administración.
+     * No permite que el admin se elimine a sí mismo.
+     */
+    public function destroyUser(User $user): RedirectResponse
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.index')
+                ->with('error', 'No puedes eliminar tu propia cuenta.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.index')
+            ->with('success', 'Usuario eliminado correctamente.');
     }
 }
