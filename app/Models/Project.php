@@ -15,8 +15,6 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
-        'status',
-        'visibility',
     ];
 
     /**
@@ -61,35 +59,6 @@ class Project extends Model
         return $this->users()->wherePivot('role', 'admin');
     }
 
-    /**
-     * Scope: proyectos activos.
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'active');
-    }
-
-    /**
-     * Scope: proyectos públicos.
-     */
-    public function scopePublic($query)
-    {
-        return $query->where('visibility', 'public');
-    }
-
-    /**
-     * Scope: proyectos visibles para un usuario.
-     * Incluye públicos + asignados directamente.
-     */
-    public function scopeVisibleTo($query, User $user)
-    {
-        return $query->where(function ($q) use ($user) {
-            $q->where('visibility', 'public')
-                ->orWhereHas('users', function ($q) use ($user) {
-                    $q->where('users.id', $user->id);
-                });
-        });
-    }
 
     /**
      * Obtener los IDs de todos los miembros del proyecto.

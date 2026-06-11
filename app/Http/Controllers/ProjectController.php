@@ -22,8 +22,6 @@ class ProjectController extends Controller
         Auth::user()->projects()->create([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
-            'status' => 'active',
-            'visibility' => 'private',
         ], ['role' => 'admin']);
 
         SidebarCacheService::forget(Auth::id());

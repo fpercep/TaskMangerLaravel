@@ -84,9 +84,9 @@ test('project member can view a project', function () {
     $response->assertOk();
 });
 
-test('non-member cannot view a private project', function () {
+test('non-member cannot view a project', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->create(['visibility' => 'private']);
+    $project = Project::factory()->create();
 
     $response = $this->actingAs($user)->get(route('projects.show', $project));
 

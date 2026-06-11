@@ -16,8 +16,6 @@ class ProjectResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'status' => $this->status,
-            'visibility' => $this->visibility,
             'created_at' => $this->created_at->format('Y-m-d'),
             // Cargamos las tareas solo si están presentes para evitar N+1 accidentales
             'tasks' => TaskResource::collection($this->whenLoaded('tasks')),

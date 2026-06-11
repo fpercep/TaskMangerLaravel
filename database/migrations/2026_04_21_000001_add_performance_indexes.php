@@ -14,10 +14,6 @@ return new class extends Migration
         Schema::table('tasks', function (Blueprint $table) {
             $table->index(['status', 'due_date']);
         });
-
-        Schema::table('projects', function (Blueprint $table) {
-            $table->index(['status', 'visibility']);
-        });
     }
 
     /**
@@ -27,10 +23,6 @@ return new class extends Migration
     {
         Schema::table('tasks', function (Blueprint $table) {
             $table->dropIndex(['status', 'due_date']);
-        });
-
-        Schema::table('projects', function (Blueprint $table) {
-            $table->dropIndex(['status', 'visibility']);
         });
     }
 };

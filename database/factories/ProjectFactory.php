@@ -19,7 +19,6 @@ class ProjectFactory extends Factory
         return [
             'name' => $this->faker->bs(),
             'description' => $this->faker->paragraph(),
-            'status' => $this->faker->randomElement(['planning', 'active', 'on_hold', 'completed']),
         ];
     }
 }

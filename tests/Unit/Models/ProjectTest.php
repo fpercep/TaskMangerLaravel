@@ -7,61 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(Tests\TestCase::class, RefreshDatabase::class);
 
-// ─── SCOPES ─────────────────────────────────────────────────────────────────
-
-test('active scope filters active projects', function () {
-    Project::factory()->create(['status' => 'active']);
-    Project::factory()->create(['status' => 'completed']);
-    Project::factory()->create(['status' => 'active']);
-
-    $active = Project::active()->get();
-
-    expect($active)->toHaveCount(2);
-    $active->each(fn ($p) => expect($p->status)->toBe('active'));
-});
-
-test('public scope filters public projects', function () {
-    Project::factory()->create(['visibility' => 'public']);
-    Project::factory()->create(['visibility' => 'private']);
-
-    $public = Project::public()->get();
-
-    expect($public)->toHaveCount(1);
-    expect($public->first()->visibility)->toBe('public');
-});
-
-test('visibleTo scope includes public projects', function () {
-    $user = User::factory()->create();
-    Project::factory()->create(['visibility' => 'public']);
-    Project::factory()->create(['visibility' => 'private']);
-
-    $visible = Project::visibleTo($user)->get();
-
-    expect($visible)->toHaveCount(1);
-});
-
-test('visibleTo scope includes projects user belongs to', function () {
-    $user = User::factory()->create();
-    $privateProject = Project::factory()->create(['visibility' => 'private']);
-    $privateProject->users()->attach($user->id, ['role' => 'editor']);
-    Project::factory()->create(['visibility' => 'private']); // no member
-
-    $visible = Project::visibleTo($user)->get();
-
-    expect($visible)->toHaveCount(1);
-    expect($visible->first()->id)->toBe($privateProject->id);
-});
-
-test('visibleTo scope includes both public and member projects', function () {
-    $user = User::factory()->create();
-    Project::factory()->create(['visibility' => 'public']);
-    $private = Project::factory()->create(['visibility' => 'private']);
-    $private->users()->attach($user->id, ['role' => 'editor']);
-
-    $visible = Project::visibleTo($user)->get();
-
-    expect($visible)->toHaveCount(2);
-});
 
 // ─── RELATIONSHIPS ──────────────────────────────────────────────────────────
 
